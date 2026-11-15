@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:9e644c6458691a8c48006fe8ea0e29ed3f03845401db3ad97aa9b4978dbe0419",
+  "pageVersion": "sha256:f7e66ed2a52dbbb24c4ac9f8d7fb7e4788b489a15872e3a2b50b853a29603cff",
   "claims": [
     {
       "id": "claim_2513ed136e6840e0bbacc76aed603ab8",
@@ -15,10 +15,58 @@
           "version": "repo-file-v1:sha256:de57f57034c8091a64fc2e3e96e5b872cc9cccb7fd3409dd0ca836c870f40b82"
         }
       ]
+    },
+    {
+      "id": "claim_c8378965b09c4e03ba03443dbb02bda6",
+      "statement": "The langchain_v1 Makefile (repo://libs/langchain_v1/Makefile) includes service management targets (start_services, stop_services) that manage PostgreSQL and Redis containers via Docker Compose for agent and middleware tests. Test targets like test, test_fast, test_watch, and extended_tests manage service lifecycle, with test setting LANGGRAPH_TEST_FAST=0 and test_fast setting LANGGRAPH_TEST_FAST=1. Coverage targets (coverage, coverage_agents) and integration_tests target are also provided.",
+      "evidence": [
+        {
+          "resource": "repo://libs/langchain_v1/Makefile",
+          "version": "repo-file-v1:sha256:bcbb6b75dfc0f8600fd21353a697611111cd727d54c7ebe8414bddc5cca3fd8f"
+        }
+      ]
+    },
+    {
+      "id": "claim_d960c33bdff744408c337456183094b4",
+      "statement": "The langchain Makefile (repo://libs/langchain/Makefile) provides test, extended_tests, test_watch, test_watch_extended, and integration_tests targets with socket restrictions and snapshot updates. It includes coverage target with .coveragerc configuration and generates XML and HTML reports. Linting and formatting targets follow the same patterns as core and langchain_v1 Makefiles.",
+      "evidence": [
+        {
+          "resource": "repo://libs/langchain/Makefile",
+          "version": "repo-file-v1:sha256:cf0121c43c27eda63ae67f3b7639849dda9ee373900de0d38d64ba5f6cf4cb7b"
+        }
+      ]
+    },
+    {
+      "id": "claim_3d93256a05d948c089a6e539cbda19b7",
+      "statement": "uv (Python dependency resolver) core commands include uv sync to synchronize virtual environments with lock files and pyproject.toml, uv lock to create or update uv.lock, and uv run to execute commands in the package environment. Common options include --all-groups to include all dependency groups, --group <name> for specific groups, and --with <package> for temporary dependencies. UV_FROZEN=true environment variable prevents lock file modifications during tests and builds.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/Makefile",
+          "version": "repo-file-v1:sha256:de57f57034c8091a64fc2e3e96e5b872cc9cccb7fd3409dd0ca836c870f40b82"
+        },
+        {
+          "resource": "repo://libs/langchain/Makefile",
+          "version": "repo-file-v1:sha256:cf0121c43c27eda63ae67f3b7639849dda9ee373900de0d38d64ba5f6cf4cb7b"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/Makefile",
+          "version": "repo-file-v1:sha256:bcbb6b75dfc0f8600fd21353a697611111cd727d54c7ebe8414bddc5cca3fd8f"
+        }
+      ]
+    },
+    {
+      "id": "claim_3a83d9be78de48a5a6bc0e6be12dea0e",
+      "statement": "The monorepo packages in libs/ are isolated: each maintains its own pyproject.toml, uv.lock, and virtual environment. The root libs/Makefile provides lock and check-lock targets that iterate over core packages (core, text-splitters, langchain, langchain_v1, model-profiles), running uv lock and uv lock --check to manage and verify lock file consistency across the workspace.",
+      "evidence": [
+        {
+          "resource": "repo://libs/Makefile",
+          "version": "repo-file-v1:sha256:b703a85cdfdb60e98c41ec8261d9b78f0e7137105ee9da36b8cb919b2d35858b"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-13T08:16:35.902Z"
+    "at": "2026-11-15T08:15:26.682Z"
   }
 }

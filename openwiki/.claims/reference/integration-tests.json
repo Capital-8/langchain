@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:b0490134580ff0f55cbc9c305560ffe9f3ec6aa4786cf782316948860a6f953a",
+  "pageVersion": "sha256:b9dc60721445616d5970d1fe7df41410e89e2aafa01b50965657056ec1fbb2df",
   "claims": [
     {
       "id": "claim_c1d6f70cda0643ccb05317c0f9f2d663",
@@ -15,10 +15,168 @@
           "version": "repo-file-v1:sha256:f6f971c5c6be3c9c40e635b5af66a08bd58aac8b6fcf353caf300441864bcace"
         }
       ]
+    },
+    {
+      "id": "claim_8362b25c75d148f2938dbd4791868b3a",
+      "statement": "The langchain-tests package provides standard test base classes (ChatModelIntegrationTests, EmbeddingsIntegrationTests, VectorStoreIntegrationTests, RetrieversIntegrationTests, ToolsIntegrationTests, BaseStoreSyncTests, SyncCacheTestSuite) that subclasses implement by providing required properties and fixtures. All inherit from BaseStandardTests, which enforces that test overrides must use @pytest.mark.xfail(reason='...') to prevent accidental test deletion.",
+      "evidence": [
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/base.py#L4-L45",
+          "version": "repo-lines-v1:sha256:49b96dddc3c7b800c20140940e635c86db3d6e8247354c0af8c7044e1d56121a:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE0YzJlNmY3MDI2Yjg0Y2NiY2VhZTBhZTkwZTY5YmY3ZDFlZDc2NDIzZjNkMWJhZTJkOGU3ZDI2YjkwYWU3N2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkMTg2ZTk3ZWU2ZDkwOGViMGQzNTBhNDI1MDFhNWI0YWM0MDg1YTJiNGI1ZGRhMWY3NzIyMjE1ODNjODhlOTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIwNDlmNjM1NmEwNGI0OTExNDYwMTg0OTIwNGZlOGVlOGU0NGM2ZWIzNWU1YWE3YjI2ODJiNWZhZTNmZTRlZjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEwZGI1OWZjYmFjYzA0Zjg0NTU0NDIwMmU1ZWFmMmU5YTQwYzE0YjkyMzU4YWQ2MjU0MGYyZDQwMjcyOGNiNmQifQ"
+        },
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/integration_tests/__init__.py",
+          "version": "repo-file-v1:sha256:9df871d4ba1b50e8a2a80adc552196db54b5e179b34f4fee49b35c5d42dfe3f7"
+        },
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/integration_tests/chat_models.py#L194-L218",
+          "version": "repo-lines-v1:sha256:a04b7c5de22f4e1bbcac275bca33123c581b5db05aea3a04ee1e528a6de370f4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzMWE0NzIxOTBlMDQ4MmNhOWYzN2RlZDI1NWM5NDA2ZmI1MjJjMDc5ZjAzMTYzN2ZmOTU0ZjlkODQxNzg1MTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2NjY1ODNhOGE1NzQ0ZjhkYWRlNDVjM2VlMWM3MmRlNDlhOGIzYTUwMmRiYTBiOWZkNDllOTU0MzRhNjQ2ZjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRlM2VlN2ZiNzA3NDNlMDdiN2M2OTk1Y2IxNWExYTI1YjBjMTZkMzlhNTVkYzhmYjEzZTA5NzIwNjJiNzcwODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMyM2IxYjMyYmJkNDliZjVkMjc4OTI3YWQ5YzUwNzEwMjhjMjUyYjJmZDM1Y2NlZjAzNTk2YzljMGYxMzZjNzQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_87ace407020e49379e28484b73830e5f",
+      "statement": "VCR cassettes are stored as gzip-compressed YAML files in tests/cassettes/ directories. The CustomSerializer uses yaml.safe_load/safe_dump for secure parsing, gzip compression for file size reduction, and _coerce_bytesio() to handle io.BytesIO objects from multipart uploads. The CustomPersister manages load/save operations using CassetteNotFoundError handling.",
+      "evidence": [
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/conftest.py#L47-L118",
+          "version": "repo-lines-v1:sha256:e63a80f6354bc599bba44086b63a5cc758e4f97c4982f219091da42ecb785266:eyJzZWxlY3RlZExpbmVDb3VudCI6NzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMyOTQyMzQ1NjE1YzAwYjE1MzgxZTYyODg2YmRhM2ZmZmY4YTU1ZjljZTVmYTAzNjBjMmI1OGI1OTg4MWU5ZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI5ZWUxOTMyODRlODJmYjc2YWY0ZjRmNTgzZTQzZjA1MDdiNWYxMzJiMTY0ZTZkMzUyM2JhZmI5NGMwYzdiMWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNkMDhjMzg4YTMzMzdlYWE0ZmU1MjAxMTc2YzEzNjk3YTQ5ZDEwMjQ2YzFjMGVmODZhM2I5NTQyODQ3M2ExYzEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c17bbdb146af47c6abe592ee5f3dde49",
+      "statement": "The base_vcr_config() function in langchain_tests.conftest defines default VCR settings: record_mode='once' (record if missing, replay if exists), filter_headers with base filters for authorization/x-api-key/api-key, match_on=['method', 'uri', 'body'] for request matching, allow_playback_repeats=True, decode_compressed_response=True, and cassette_library_dir='tests/cassettes'.",
+      "evidence": [
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/conftest.py#L130-L155",
+          "version": "repo-lines-v1:sha256:e3d0704dff8fca8d0a61d64b2b6b1bd421654204ab5faef64b64dd5b52df2ddf:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxNzhlNTQ1YjAyMTRlNDM2NDIxYTRiMzBiZDQ0NThjNDgxZGY5OTY5NWRkNjRmZjhkNmM1MDkxMTZjMmE5NTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxY2I2ZmI5YmVjNzJmZjA3ZTY4MDU0N2M3NTAyMzZkYWZmNDMzOWVhZTY5ODBkM2IwOTQwMmRkYmE4YzcwOTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQzZDE3MWRlNzU0MzFhMDIxYTBkOTRmYTc2ZmFiZjBkNzEzOWM4OThjMWEwYjQ0YjQzY2E2MDkwM2ZhMWI4NDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3fca81158aec4a298bef9df56cc2319d",
+      "statement": "SandboxIntegrationTests tests implementations of deepagents.backends.protocol.SandboxBackendProtocol, an abstraction for isolated code execution. Standard tests verify file operations (write, read, edit, ls, glob, grep), upload/download roundtrips with byte integrity, command execution with large output handling, and error conditions (file_not_found, permission_denied, invalid_path). Implementations must provide a sandbox fixture that yields a clean SandboxBackendProtocol instance.",
+      "evidence": [
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/integration_tests/__init__.py#L42-L45",
+          "version": "repo-lines-v1:sha256:edd1e40e7ca7cb9f5bee632d4a1169a88b05b7e9960b53e4f317a558d956d6ca:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDNlZDY1ZGM0MjQwMGNmMzIwMTYyYTc1ZWU1YjAyNjE1ZmIyODkxM2NlZWJjYTMyZmViYzE0Y2ZkZTkyZTgyZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzBjMWYxODhmMTQyZWQ3YTgyNDY4MGIyMDcxNzJjNTUxOWJjNjE0YTQ4ZmRhN2NmMTY3ZWRiOGRkZjc5OTU2YyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjA4YjAyMzk1YmU4ZmUzNWVjNTQ2ZmY1NGQwYjMzYWE2MjZmNGUxMTNjYWZkNzczMTNkOGVmNGYyM2NlYTIwOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDFmNWQwNDRlYjU5ZjZkNTAxZjY5ZjdlNGZhNmIzOTcyNWNmZDc3NjAyNTdlYzM4MTcxNDhhOTVjMmM4MWJhOSJ9"
+        },
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/integration_tests/sandboxes.py#L1-L120",
+          "version": "repo-lines-v1:sha256:597160d0a0812c56b00480e728557b62500ff7b523623dfa82578a8ab851930b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyZGQxZGIzYmIwZTQ4ZGFkNDFhYjY0ZTJkZmY1YTVkNTBkMGRhMzMyMWY1NmZkZjNjMWJlMjNhMjhhM2UxMGQxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJkMTA0MjRiZGUzYWQ5MWZmOGRhZWE4MWE0YWE1MDRiMmZlOWQzNzkyM2Y1OTM3OTE1MmQ1NDNkN2I0ZGVhZjcxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJjYzBkMDE1YTFiNDJmMmM5OTdkNWU1OTg5NmY2ZWEzYzFmM2UzNjFjZGI2ZjhjYjJhOTYzMzg3MmE3YmNkMTExIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_3db27544a4c34d3baa9ac938a8b5f465",
+      "statement": "SandboxBackendProtocol file operations include: write(path, content) for creating new files with parent directory auto-creation, read(path) returning ReadResult with base64-encoded binary content (512 KiB preview limit), edit(path, old_text, new_text) for single-occurrence text replacement, ls(directory) for directory listing, glob(pattern, path) for pattern matching, and grep(text, path) for literal text search. Paths must be absolute; relative paths return invalid_path error.",
+      "evidence": [
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/integration_tests/sandboxes.py#L130-L215",
+          "version": "repo-lines-v1:sha256:a3ecd02b49a93d26f4b29cbc41747826598b9103768e817138542989636a0268:eyJzZWxlY3RlZExpbmVDb3VudCI6ODYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNkM2JkZDc3OGQxNzY5MDg0NjBiMmVhNmE0ZGVhNzZhMDU1OTE0OGJlNDM3ZmQ3NDc2NjRlYTc5ZjRlZWE5NTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2NjhjMWQ5ZGYwMjc4MjZjMTBjY2ViMGM2N2NiMGFiZmUwYmIxYzc0NmZlNDkzZDJmYTIwM2Y0ZTBkZGZhMmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZiOTY1YzBkYzlkNDQwYzA4YzAxZjMxYWIyMDRmZTMwMmY1YjM3YWU3ZDE0NWIzNTY2MzAxOTM0ZTJhYWQyMjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNiNGU1NWI2MGI2ZGE2ZWU5NjkxMmEwMzc0ZjY3NGIwYWI0YTgyMjJhZDI0NWY4YWU2NDU4ZDI3NGNjOWZmYWQifQ"
+        },
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/integration_tests/sandboxes.py#L609-L675",
+          "version": "repo-lines-v1:sha256:60ef5c509366e68513c1c76adb2460f7c6198a4a5f7759abba35cfc95fdcd834:eyJzZWxlY3RlZExpbmVDb3VudCI6NjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE0ZTQ2OGZmN2UyMjg3MWQ5MTgyZjhiNDQ3NjE2MWRjNGZhZGRmM2M4NWMyNzRkMDVmZTRlOWFhNzYxNTZhMmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxOGU4M2Y2MDM3ZmU2NWI4OWMwN2Q5OGZkYzE1ZGQ5ODY0Mzk5N2IxNTNkMzhlYmVjZmFlNjZjNThmODQ3MDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU1NzUyZDc5ZWZlZmY5ODY1YzYxZTEzNDVlNmJkYWU3ODg3MDI4ZTQ4MTA1NDE1ZjAyYjJmNGUyYjNhNTk3MDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU1NDg0YzMwNWY4YzcyNGQ5NTRiNGQ0ODIxOTQ3YzBlMTE1NTM1NjM0OWMxYWMxODkyY2Q1Mjg4ODg5ZDY5ZGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7cab904930ff40cda20f37e4456e28af",
+      "statement": "SandboxBackendProtocol upload_files() accepts list[(path, bytes)] and returns FileUploadResponse list preserving input order. download_files() accepts path list and returns FileDownloadResponse list with content, error handling for missing files/directories/permissions, and 10 MiB+ file support. Relative paths return invalid_path error; missing parent directories may be auto-created or error depending on implementation.",
+      "evidence": [
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/integration_tests/sandboxes.py#L377-L520",
+          "version": "repo-lines-v1:sha256:52ae017049c8224f0c2300eeb227173c89369d2494469d6701d583fdfb058c16:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQ0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5M2FlZTdiNTE2Njg5OTkwMmFjNTEzY2IxZThiM2Y5YjVjYTdjMWQ1ZDZkMjk0NjYxNGFjNmVkZjljZDIzMmE3IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI3ZTk4ZDE5M2E2NDNjODhmNTBiYWRiYTYyYmM3NjQ2NmEwMjQ4NDYzM2QyMjUzYjI5MzdhZTQ4MjVlNWE3ZTIyIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJhNjlkYTIwMDcxZDFhZmY2OWExMzMwZGQ3ZjI2MTM1YTc5MGM2YzZjOTRjMWNlYWM2ZWJkNjI0OTBjOTZkYzIzIn0"
+        },
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/integration_tests/sandboxes.py#L547-L626",
+          "version": "repo-lines-v1:sha256:58d3cc2ed6274938655fea14cd38983399124e737ed3322e6e1fd756952bd07f:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ2ZTFlYzJlZGM2YzQ0NzE3N2Y2OThhM2IxYTA1YjA3YjhiYzE2ODNkMTQwZDg0OTkwYTZkZGI0ZmVkZDU2MGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQzZjEyOWVjNTQ1MTY2YjU0ODljMGYyMDgxNzI3NTdhYzU1YmM0NDVkMzk2MWViM2MxOGZkYjI5ZGIxMzZmYmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBlMjQ2ZDYzZGExYjc0NGY3Mjg2MTYxODNhZTU5ZWRmYWI5ZjRmODgyOWQyMTE2NzFjY2ZiOWM2NTBhMWYwMmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3701231973904c92913216cfadc2496f",
+      "statement": "SandboxBackendProtocol execute(command_string) runs shell commands and returns ExecuteResponse with exit_code, output (stdout+stderr combined), and truncated flag. Large output (~500 KiB+) is handled; deepagents.backends.CompositeBackend can offload over-budget results to artifacts_root/large_tool_results/<tool-id> with head/tail preview in tool message.",
+      "evidence": [
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/integration_tests/sandboxes.py#L220-L303",
+          "version": "repo-lines-v1:sha256:8f6a0d46a88def428170ba1798fa72280e774a39a6473fae6385ac996ef7daab:eyJzZWxlY3RlZExpbmVDb3VudCI6ODQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE3MTliYWIwYzEyMzUyN2E3ZDc1YjkyZGNkYWVjOGQ3NjZmNmE5ZjQ4YmFhOGM1M2FlYjQyMmE2OTFmZWFhMzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUwMWM0MjAyOWE3MmEyZWVkOGIxNGVmZDYyMzE3NzIyYjRiZWVmMTkwYzViY2NiMzM2ZjcyNDljNjIzOTA4N2EiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcyOTFiODNmZTU2M2E4MjQwMzY1MTU4N2ZjYWY5MDE4ODgwM2ZkOWRjYTU0NzAxODgxYWZmNzBlNTVjNjI0MDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5OGI1YjFjZTdlN2FlZjFmMzUyNzAwZmU0ZmZiNTYzYjM5MzQwYjkzNjIyN2NlN2NmNjNiYzBjMjdiNTE1MDcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1a23a2ece5a040ef96e1baea7c39b28c",
+      "statement": "SandboxIntegrationTests uses sandbox_test_root fixture (autouse=True) to create isolated per-test directories, keyed to request.node.name. sandbox_path() helper builds absolute paths under sandbox_root_dir (/tmp/test_sandbox_ops/ by default). has_sync and has_async properties control test execution; tests skip if unsupported.",
+      "evidence": [
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/integration_tests/sandboxes.py#L87-L128",
+          "version": "repo-lines-v1:sha256:7bbfd6a3498f024478951fdad8808e6942592ee9881f4094bb44c81db9a1f46b:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzZDAwY2YyNzA5NjRkNDRhMTNkZmFjODc1MmIwOWZjYzQzNWIwZjE5YjMxNmFiY2Y4MWE3YWE2NGJiMTIyZDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ2Njk3NjI1NzM2MjA3YzlkZmVlNzc4MjgyOTRlOTNmODIxOTA1NGU3MjgyMThiODliY2RhYjdhOWJkYjcwMGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMyMTA5N2EwNzdiMjY5YWQwOTZlMDkzNWE1MGFlZDFkNGJjNmVmNWFmZWU5ZTk1ZTVhMDk2OWQzNDlhZjkyNDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUzMzlmYmZlMTllZGMxNjg5YzRmNmQ0MjkzMjczMGRlM2FmZmMxYTA1ZGY4NDNkZTBjYWU3Yjk1Y2Q3OWFiNjkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1c16a49ba44844998556f560f057e14d",
+      "statement": "ChatModelIntegrationTests requires chat_model_class and chat_model_params properties and optionally supports has_tool_calling, has_structured_output, supports_image_inputs, enable_vcr_tests, and structured_output_kwargs properties to control feature testing. Feature flags auto-detect from model method signatures (e.g., bind_tools override indicates tool_calling support). VCR tests are opt-in (default=False) but enabled in partner implementations.",
+      "evidence": [
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/integration_tests/chat_models.py#L194-L300",
+          "version": "repo-lines-v1:sha256:0e5a609af7893f45ad021652cf4b7c838843d5cd54c552dd32341d769fca399a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIzMzFhNDcyMTkwZTA0ODJjYTlmMzdkZWQyNTVjOTQwNmZiNTIyYzA3OWYwMzE2MzdmZjk1NGY5ZDg0MTc4NTE2IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIyY2ZjZDc3Nzg1MDQ0NmU5MjdlODBiZjhjODY4OWVkYjYxZjBjODU5MGQyYWI1OGQxMTUxNzU1ZjhhNWE4NTU4IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI0ZTNlZTdmYjcwNzQzZTA3YjdjNjk5NWNiMTVhMWEyNWIwYzE2ZDM5YTU1ZGM4ZmIxM2UwOTcyMDYyYjc3MDg3IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI3ZjI4NmRlN2JiYTM4MDU5ZDUyZjc1ODI3YjdlY2JiYjc2MjhkYTY5NGFlNGVmOWI1NmY3YTJjMjM3ZmUyYmU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_ea5a16ba39834d62a9697f7b21f68f0a",
+      "statement": "EmbeddingsIntegrationTests requires embeddings_class and embedding_model_params properties, testing embed_query() and embed_documents() with consistency assertions. RetrieversIntegrationTests requires retriever_constructor, retriever_constructor_params, and retriever_query_example properties, with configurable num_results_arg_name (default='k') for parameterized result count testing.",
+      "evidence": [
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/integration_tests/embeddings.py#L8-L37",
+          "version": "repo-lines-v1:sha256:737a3d384894f8183e363df8dbc64ff9d02442b1b738ceb8bf93e180df222e17:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0MDg1NzljZDAwNDE2NjJiNjY1ZDVkYTcxODk0YmU1NWFhYzU5YjExNzUyNDJhZjBkZDcwZDJjNDFlMTZlM2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2YTcxNTI1NzJlZTg0ZjEwOTA2Yzc0YjlmMmE5MjQzNGRkYWIwZTNjNDI4MTNiMDRlNTk3ZWZjZWM5NTFiMjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg0ZTk5YTViNGE3MjMwOTQ5ZmJkNjUzYTRmMzA0NzNhMjk3NDJiNTY0MDczZDgxZTI4ZmJiMzljYWM1NWFmYjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM0NjNhYTMxMTFiZjdmODI3NTk1ODhkM2ZkNTM1ZWM5MDg0YTY4ZTlmNzU3ZGQ5NjcwMjUwN2M5N2ZlODRmMGIifQ"
+        },
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/integration_tests/retrievers.py#L13-L51",
+          "version": "repo-lines-v1:sha256:344fea654fcec833b6677870f0dfcce7eee3d0f040ae4ac18b643aa7daae42f0:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVjMDBmNTE1ZDY1NWMxZTkwNTU5MzU5MzYxMjNiMWI3YzQ0NmViYmIwMTcwOTk1ZmRjNjIyZDBmYTBkMzk0ZDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI2M2I0OWFkZDc0YzBkM2Q2YTQyN2VlZTJiN2M2MzY2MzMwNzYzNWQyZmEyMWNiYzdmMjY4ZGJhNGVkMTU4NzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVkMTA5ZmRkZWUwMTc1ZGI2ODI0MzUyMmM4YWFhNzk4ZGFmOTNlMDEyM2VhYzQ0YjQ4MmM0NzA2YmRmYTM4MTgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_57d180df26a84dceb397e8827ce997a8",
+      "statement": "VectorStoreIntegrationTests requires vectorstore fixture returning empty VectorStore, reset after each test via try/finally. Implementation controls testing scope with has_sync/has_async/has_get_by_ids boolean properties (all default True). get_embeddings() returns DeterministicFakeEmbedding with size=6 for deterministic, fast test execution.",
+      "evidence": [
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/integration_tests/vectorstores.py#L21-L136",
+          "version": "repo-lines-v1:sha256:8b3a11b644fa81a836a60c1546013994d42a1043808a570f9a1e54496d223062:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIxOGI3NjU0ZDE1MTJiYTFkZTA0YWZjM2E5OTRkNjRjZjg4YzRhY2E4YzZmYzVmYjZhNjhiYzk2YTJhOTJlZWNhIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI1OTA5YTUzYTYxOGQwMjhlMWQzMDAwYzBhN2FiY2VlY2JlNWZiMzdmNGU1MTFlZmU0NjY0M2ZhZDZlNjY4NzJmIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIxNTEzNGM3ODczNGY3NDg3NjRlOTJjMTNjMGM3ODRlZDA2MWM1ZTdiZGRiZjVmOTU1ZWRlNzI5MzJhNmIwZDBmIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiNjFhOTIwZDU3Zjc4MWZlMzQwYzAwMDg4ZDlhMmQ3YTU3ZGQzMDEzNmExNmMyMGJiYjJjMTliNTRlZjIyZWFhIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_bc5a9106bac3421bbc4ff17253505401",
+      "statement": "BaseStoreSyncTests and BaseStoreAsyncTests require kv_store and three_values fixtures (empty store, three example values). SyncCacheTestSuite and AsyncCacheTestSuite require cache fixture (empty cache). Tests validate get/set/delete operations, lookup/update for cache, with fixture reset between tests ensuring isolation.",
+      "evidence": [
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/integration_tests/base_store.py#L19-L50",
+          "version": "repo-lines-v1:sha256:3bacce286bd01486ae185954b81704b62b97f05f792a3d0af4fdf438cf255f7d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJiZTgyMzE5MzBmNTQ4NmY3YzkzOTIyMDE1NjU3ZWY1MWUzYTc4NjRlN2NhMDZjNDU2ODdjNjZjNzdlYWVkMzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE3YTQzNThmM2Y2YThmOTk1NDMyMjYwOWY5ZjhkMmU4ZjFhYTk0OGIzYWRmNzk5MjcwZTgzODhhYzg1NDNkZjIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk4YzFiY2U4M2MwMjI4ZDA3MzBmYTU4MTg1ZmRjM2UzNTY3NDM2Yjg2MTU3NjAxZjc0MjY5YmU4ZDJjOWI5Y2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhlODA1ZTc5ZjM3ZTM4ZmZlNDgzNzk0YmUwZDUyMTkxNTFmN2RkYTNjM2U2ODgyMjcwMzIzNmFlMjkxMTlhNDIifQ"
+        },
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/integration_tests/cache.py#L16-L95",
+          "version": "repo-lines-v1:sha256:05842e763b1a2d84e61f640e0440107447a6d3a17264ffad6180bf57184038d9:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJlOWU2NzgxNGFmMDAzODNmYmM4NDgzYmRkYjAyYTdiZGFlMWM2MDU1MjRmZmRlYzI1M2YwYzQxNzY4ZDNhYmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhZTA1YTFlZDNlYTc0YWY3NThjOTk2NGIwMzlhY2E2OWUzOTEzNGJlMzJlNzQyZDljZWYxMGRhZGFhZDIzZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI2M2I0OWFkZDc0YzBkM2Q2YTQyN2VlZTJiN2M2MzY2MzMwNzYzNWQyZmEyMWNiYzdmMjY4ZGJhNGVkMTU4NzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRlZDUxMTY1ZDA5NjFjNTkzOGI5YTU2NDk0NzA4ZjMzZGRhMDU2Y2JkOTVlMzI2NDc0MDkyMTUyNzNjMjlhMjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7c6a3ef9a50f4665b11e2cbc3b0f70ae",
+      "statement": "ToolsIntegrationTests requires tool_invoke_params_example property (example dict for tool invocation). Standard tests validate tool.invoke(ToolCall) and tool.ainvoke(ToolCall) return valid ToolMessage with proper content/artifact structure, and tool.invoke(dict) accepts plain kwargs without error.",
+      "evidence": [
+        {
+          "resource": "repo://libs/standard-tests/langchain_tests/integration_tests/tools.py#L9-L94",
+          "version": "repo-lines-v1:sha256:f094e671e1b3758da02d87d40cf103ddcd3fefa9b53e1dd06db5c00c97ff631b:eyJzZWxlY3RlZExpbmVDb3VudCI6ODYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhNWYzNmNlMDNmOTQ2MTE2ZTIwNmUxYTg5YWQ1ZTBmOGQ1ZjI1MTk5MzY0YjM5NmUzYjk0OTIyM2MwNjRmODUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzMTczYTEwMGQzZmUxMjQyODA1OGU1YjgxNmVkZWFiYThiZTJjNzY4YzkzZTk4MDNmZDM0ZmM1NDBmMzUxNjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlYzRmZDZmZWZiYTlhMjA0NDBlMDJiYjRmMjdmNmNhYTkzMmU1N2VlYTVmYjlmYjEzMjBmNWExYWQ5YmRhMzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-13T08:16:35.902Z"
+    "at": "2026-11-15T08:15:26.682Z"
   }
 }

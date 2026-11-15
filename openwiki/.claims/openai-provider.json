@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:54e2d5a2b8a86b683ff5a04fd0143081d82303d79869a8ba92aac48b0925e6ec",
+  "pageVersion": "sha256:7ef08ef25d26c75afc2c6da75dfb5145c697ba4f3d9feb4bb390dddd71a7ee8d",
   "claims": [
     {
       "id": "claim_347664eb68464142b558791c7a95093f",
@@ -21,8 +21,8 @@
       "statement": "OpenAI API key can be provided as a string, sync callable, or async callable; if not provided, it is inferred from OPENAI_API_KEY environment variable.",
       "evidence": [
         {
-          "resource": "repo://libs/partners/openai/langchain_openai/chat_models/base.py#L740-L790",
-          "version": "repo-lines-v1:sha256:003a6dab73ea8fde5dc6459b1b513510f5f2edaf2d067675483617e4bbadc10c:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg0NWZkNDk1ZWU5OWQ1OWFkN2VlNWNlNjc3NzY4NTA2OWZlYzJiMzFlN2VlOWI0ZjlhMjA2M2RlMWRkNjFhNjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2YTcxNTI1NzJlZTg0ZjEwOTA2Yzc0YjlmMmE5MjQzNGRkYWIwZTNjNDI4MTNiMDRlNTk3ZWZjZWM5NTFiMjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ4YzBjYzA4MjViNjY2MWI1ZmM0YWE1MjQ5NmJhOGM5ODIxNTY3MzFiNTM2NTBlYjhiYTYxYmRmNjI2ZmNlNGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMyNjAzZjZjNDViZmIxODk0YWE5ZWMzY2U4MDJhMTNlMDA5YzcyNDgyMzZmOWIxMzdjMTNiODFjZmQ1NGNmYmUifQ"
+          "resource": "repo://libs/partners/openai/langchain_openai/chat_models/base.py#L814-L864",
+          "version": "repo-lines-v1:sha256:bf96495a283eac05f6522d00a63dff41926406e63dcdc52005a9e1bffc487d9f:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg0NWZkNDk1ZWU5OWQ1OWFkN2VlNWNlNjc3NzY4NTA2OWZlYzJiMzFlN2VlOWI0ZjlhMjA2M2RlMWRkNjFhNjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2YTcxNTI1NzJlZTg0ZjEwOTA2Yzc0YjlmMmE5MjQzNGRkYWIwZTNjNDI4MTNiMDRlNTk3ZWZjZWM5NTFiMjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ4YzBjYzA4MjViNjY2MWI1ZmM0YWE1MjQ5NmJhOGM5ODIxNTY3MzFiNTM2NTBlYjhiYTYxYmRmNjI2ZmNlNGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMyNjAzZjZjNDViZmIxODk0YWE5ZWMzY2U4MDJhMTNlMDA5YzcyNDgyMzZmOWIxMzdjMTNiODFjZmQ1NGNmYmUifQ"
         }
       ]
     },
@@ -299,14 +299,14 @@
       "statement": "OpenAIDecisions resolves API configuration (base_url, api_key) from explicit parameters, environment variables (OPENAI_API_BASE, OPENAI_API_KEY, OPENAI_ORG_ID), LangSmith gateway when LANGSMITH_GATEWAY is set, and underlying OpenAI SDK defaults.",
       "evidence": [
         {
-          "resource": "repo://libs/partners/openai/langchain_openai/decisions/base.py#L49-L124",
-          "version": "repo-lines-v1:sha256:ee792a3504662be904b0be937505f2a1ee515f2eb8432695760a22788682bc61:eyJzZWxlY3RlZExpbmVDb3VudCI6NzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkODBlMjQ5NGI5OGFlY2UyNjlkYjE5M2NlYjRjYTdjNzhkZTA3NTM5ZjM3MWZiNTY5MzMxY2MwMTk1MWQ3ODQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2YTcxNTI1NzJlZTg0ZjEwOTA2Yzc0YjlmMmE5MjQzNGRkYWIwZTNjNDI4MTNiMDRlNTk3ZWZjZWM5NTFiMjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUyZTkyMzQ5MTk0NGUwYzNjY2U4ZTMwZWU5ZDIyNzE5MzAzYjUyMTViMmE5ZTFjZWY0OWVkNWJkYWVkZDFmZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBkNTYzNTRkOThlODM3N2NmZTg0NDNhNTY5Y2MwOTkxNzBjYzNmZGIyMDJhOTM1ZWYyNmJmOTUxYWQ5NDVlMDkifQ"
+          "resource": "repo://libs/partners/openai/langchain_openai/decisions/base.py#L106-L189",
+          "version": "repo-lines-v1:sha256:7ebe4221ac68d8b72839a188071c6fcd5d00eacd2ff389b14254f7727d25ea82:eyJzZWxlY3RlZExpbmVDb3VudCI6ODQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmNmY0ZDZjYTA5M2Y1MjAyZjRiN2M4YmRhZDEwOTk2ODllYjk2MDNlMmM0Yjk5NTA0ZWUwMDcwMTkwYjVkZTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEyYWIwOTBiY2QxNjIwZmE2MmVhZWUxNTdhNzRmY2E2MzVhYTI5ZTEyY2JmZmQ2MThiNTc5MmQ4N2JjMDNhM2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFmZGM0ODU5ZWY3NjIwZWVjYjkwZjU1OWI5M2E3YjlkMTZmYjhiMGJhNzJiOWMxNTViMWI2YjdhYWRiYWMzMjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU5ZGM0MGNlZGE5MzgzNjA3NTYzNmQxNjlkYjJkNWUwNjAxODgxM2JlYjkyZGFiOWQ3MTA5YjQyMTQzY2RhZGQifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-13T08:16:35.902Z"
+    "at": "2026-11-15T08:15:26.682Z"
   }
 }

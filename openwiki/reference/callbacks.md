@@ -5,7 +5,7 @@ description: Complete API reference for callback handlers, managers, and run man
 tags: [callbacks, API, reference, handlers, managers]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-11-13T08:16:35.902Z
+    at: 2026-11-15T08:15:26.682Z
 sources:
   - id: openwiki-source-c9313cf42f0120d86b20245f
     resource: repo://libs/core/langchain_core/callbacks/base.py

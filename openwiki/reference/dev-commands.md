@@ -5,24 +5,37 @@ description: "Complete reference for make targets and uv package management comm
 tags: [development, commands, make, uv, testing, linting, reference]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-11-13T08:16:35.902Z
+    at: 2026-11-15T08:15:26.682Z
 sources:
   - id: openwiki-source-8f1875229ad4a704c8e20a06
     resource: repo://libs/core/Makefile
+  - id: openwiki-source-7c96a74af67942d40559bf7d
+    resource: repo://libs/langchain_v1/Makefile
+  - id: openwiki-source-f708a9db48bfcf1b154e4708
+    resource: repo://libs/langchain/Makefile
   - id: openwiki-source-49fbcc45434b619b68220bf9
     resource: repo://libs/Makefile
-generated: { by: "openwiki/0.5.0", at: "2026-11-13T08:16:35.902Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-11-15T08:15:26.682Z" }
 ---
 
 ## Make Targets Reference
 
-All packages in `libs/` include a `Makefile` that defines development tasks. These targets are run through `uv run` within virtual environments managed automatically by uv. The core `Makefile` is located at `repo://libs/core/Makefile`.
+All packages in `libs/` include a `Makefile` that defines development tasks. These targets are run through `uv run` within virtual environments managed automatically by uv.
+
+### Core Makefiles
+
+The monorepo includes three primary package Makefiles:
+- **`repo://libs/core/Makefile`** – Core package targets (langchain_core)
+- **`repo://libs/langchain_v1/Makefile`** – LangChain v1 compatibility targets (langchain)
+- **`repo://libs/langchain/Makefile`** – New LangChain package targets (langchain_classic)
+
+All follow similar patterns with some package-specific features (e.g., langchain_v1 includes service management for database/cache tests).
 
 ### Testing Targets
 
 #### `make test` / `make tests`
 
-Runs unit tests using pytest with automatic parallelization and socket restrictions enabled. Environment variables for tracing are unset to prevent interference.
+Runs unit tests using pytest with automatic parallelization and socket restrictions enabled. Environment variables for tracing are unset (core package) or tests run with service dependencies (langchain_v1).
 
 **Command:**
 ```bash
@@ -30,12 +43,23 @@ make test
 make tests  # alias
 ```
 
-**Behavior:**
+**Core Makefile behavior (repo://libs/core/Makefile):**
 - Disables network sockets except Unix sockets (prevents accidental external connections)
 - Runs tests in parallel with `pytest -n auto` (requires pytest-xdist)
 - Disables benchmark mode with `--benchmark-disable`
-- Unsets tracing environment variables (`LANGCHAIN_TRACING_V2`, `LANGCHAIN_API_KEY`, `LANGSMITH_API_KEY`, `LANGSMITH_TRACING`, `LANGCHAIN_PROJECT`)
+- Unsets tracing environment variables to isolate tests:
+  - `LANGCHAIN_TRACING_V2`
+  - `LANGCHAIN_API_KEY`
+  - `LANGSMITH_API_KEY`
+  - `LANGSMITH_TRACING`
+  - `LANGCHAIN_PROJECT`
 - Default test path: `tests/unit_tests/`
+
+**LangChain v1 behavior (repo://libs/langchain_v1/Makefile):**
+- Starts Docker Compose services (PostgreSQL, Redis) for agent/middleware tests
+- Sets `LANGGRAPH_TEST_FAST=0` to run full integration tests
+- Gracefully stops services even if tests fail
+- Runs with `pytest -n auto` parallelization
 
 **Custom test file:**
 ```bash
@@ -49,6 +73,20 @@ make test PYTEST_EXTRA="-vv --pdb"
 
 **Environment variable set in Makefile:**
 - `UV_FROZEN=true` — Prevents unintended changes to lock files
+
+#### `make test_fast` (langchain_v1 only)
+
+Runs tests with in-memory services only (no Docker containers).
+
+**Command:**
+```bash
+make test_fast
+```
+
+**Behavior:**
+- Sets `LANGGRAPH_TEST_FAST=1` environment variable
+- Runs without starting Docker services
+- Faster feedback loop for development
 
 #### `make test_watch`
 
@@ -67,7 +105,13 @@ make test_watch
 - Socket restrictions enabled
 - Default path: current directory `.`
 
-#### `make test_profile`
+**LangChain v1 watch modes:**
+```bash
+make test_watch              # Watch tests with full services
+make test_watch_extended     # Watch only extended tests with full services
+```
+
+#### `make test_profile` (core only)
 
 Generates performance profile information as SVG files for analyzing test execution performance.
 
@@ -94,6 +138,48 @@ make extended_tests
 - Uses `--only-extended` flag to filter to extended test markers
 - Socket restrictions enabled
 - Allows customizing test path with `TEST_FILE` parameter
+
+#### `make coverage` (langchain_v1, langchain only)
+
+Runs tests with coverage analysis and generates coverage reports.
+
+**Command:**
+```bash
+make coverage
+```
+
+**Behavior:**
+- Runs pytest with `--cov` flag and `.coveragerc` configuration
+- Generates XML and terminal reports showing missing coverage
+- Default test path: `tests/unit_tests/`
+
+#### `make coverage_agents` (langchain_v1 only)
+
+Runs agent and middleware tests with coverage focused on `langchain.agents` module.
+
+**Command:**
+```bash
+make coverage_agents
+```
+
+**Behavior:**
+- Runs tests in `tests/unit_tests/agents/middleware/` and `tests/unit_tests/agents/test_*.py`
+- Generates HTML coverage report in `htmlcov/`
+- Focuses coverage on `langchain.agents` module
+
+#### `make integration_tests`
+
+Runs integration tests that require external services or API keys.
+
+**Command:**
+```bash
+make integration_tests
+```
+
+**Behavior:**
+- Syncs with both `test` and `test_integration` dependency groups
+- Runs tests in `tests/integration_tests/`
+- Requires additional API keys and external service setup
 
 ### Code Quality Targets
 
@@ -186,8 +272,12 @@ make check_imports
 ```
 
 **Behavior:**
-- Runs `./scripts/check_imports.py` on all `.py` files in `langchain_core` (or equivalent package directory)
+- Runs `./scripts/check_imports.py` on all `.py` files in the package
 - Detects circular imports and other import issues
+- Target directories vary by package:
+  - Core: `langchain_core`
+  - LangChain v1: `langchain`
+  - LangChain: `langchain_classic`
 
 #### `make benchmark`
 
@@ -198,10 +288,43 @@ Runs benchmark tests using codspeed for performance profiling.
 make benchmark
 ```
 
-**Behavior:**
+**Behavior (core):**
 - Runs `pytest tests/benchmarks --codspeed`
 - Generates performance comparison data
-- Useful for catching performance regressions
+
+**Behavior (langchain_v1):**
+- Runs `pytest tests/benchmarks/test_create_agent.py -m benchmark`
+- Focused agent creation performance testing
+
+### Docker Service Management (langchain_v1 only)
+
+#### `make start_services`
+
+Starts PostgreSQL and Redis containers required by agent tests.
+
+**Command:**
+```bash
+make start_services
+```
+
+**Behavior:**
+- Starts Docker containers using `docker compose`
+- Composes: PostgreSQL (compose-postgres.yml) and Redis (compose-redis.yml)
+- Creates fresh containers with `--force-recreate`
+- Waits for containers to be healthy with `--wait`
+
+#### `make stop_services`
+
+Stops and removes Docker service containers.
+
+**Command:**
+```bash
+make stop_services
+```
+
+**Behavior:**
+- Removes containers and volumes
+- Cleans up after test runs
 
 ### Help and Metadata
 
@@ -214,7 +337,7 @@ Displays all available make targets with brief descriptions.
 make help
 ```
 
-**Output example:**
+**Output example (core):**
 ```
 ----
 format                       - run code formatters
@@ -350,6 +473,11 @@ uv run --all-groups ruff check .      # Linting with all tools
 uv run --group lint ruff format .     # Formatting with lint group
 ```
 
+**uv run flags commonly used in Makefiles:**
+- `--no-sync` — Skip automatic sync before running (uses existing env)
+- `--active` — Use active virtual environment instead of creating new one
+- `--all-groups` — Include all dependency groups
+
 **Environment variable control:**
 - `UV_FROZEN=true` — Fail if lock file would be modified (used in CI/tests)
 - `UV_OFFLINE=true` — Fail if network access needed (requires pre-synced env)
@@ -378,8 +506,8 @@ cd libs/core
 uv sync --all-groups       # Sets up environment for core only
 uv run pytest tests/
 
-cd ../langchain
-uv sync --all-groups       # Separate environment for langchain
+cd ../langchain_v1
+uv sync --all-groups       # Separate environment for langchain_v1
 uv run pytest tests/
 ```
 
@@ -444,6 +572,13 @@ UV_CACHE_DIR=<path>        # Custom cache directory for package index
 UV_NO_SYNC=true            # Skip automatic sync before running
 ```
 
+### LangGraph Test Configuration (langchain_v1)
+
+```
+LANGGRAPH_TEST_FAST=0      # Run full integration tests with services (default)
+LANGGRAPH_TEST_FAST=1      # Run tests with in-memory services only
+```
+
 ## Common Development Workflows
 
 ### Setup New Package
@@ -468,6 +603,28 @@ make test_watch
 
 # Run with extra pytest options
 make test PYTEST_EXTRA="-vv -k test_name"
+
+# Run extended tests only
+make extended_tests
+
+# Run integration tests
+make integration_tests
+```
+
+### Run Tests with Services (langchain_v1)
+
+```bash
+# Run tests with PostgreSQL and Redis services
+make test
+
+# Run tests without Docker services (faster feedback)
+make test_fast
+
+# Watch tests with services
+make test_watch
+
+# Extended tests with services
+make extended_tests
 ```
 
 ### Check Code Quality Before Commit
@@ -500,6 +657,19 @@ uv sync --group test_integration
 
 # Run integration tests
 uv run --group test_integration pytest tests/integration_tests/
+```
+
+### Generate Coverage Report
+
+```bash
+# Full coverage report (langchain_v1, langchain)
+make coverage
+
+# Agent-focused coverage (langchain_v1)
+make coverage_agents
+
+# Benchmark specific tests (langchain_v1)
+make benchmark
 ```
 
 ## Troubleshooting
@@ -552,4 +722,21 @@ Clear the mypy cache:
 cd libs/<package_name>
 rm -rf .mypy_cache .mypy_cache_test
 make type
+```
+
+### Docker services fail to start (langchain_v1)
+
+Ensure Docker daemon is running and compose is available:
+
+```bash
+docker --version  # Verify Docker installed
+docker compose version  # Verify Compose installed
+make start_services  # Try again
+```
+
+If containers fail to become healthy, manually clean up:
+
+```bash
+docker compose -f tests/unit_tests/agents/compose-postgres.yml -f tests/unit_tests/agents/compose-redis.yml down -v
+make start_services
 ```

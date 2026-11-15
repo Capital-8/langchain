@@ -1,6 +1,6 @@
 # Files
 
-- [Agent Execution: Agentic Loops and State Management](agent-execution.md) - Detailed walkthrough of agent lifecycle, execution loops, state management, tool calling, error handling, and observability in LangChain agents.
+- [Agent Execution: create_agent and Middleware Pipeline](agent-execution.md) - Explains the agent factory pattern that composes models, tools, and middleware into structured agent loops with state management and controlled execution flow.
 - [Composability: Chaining & Piping Runnables & Hierarchical Agents](composability.md) - Learn how to build complex applications by composing runnables through pipe operators, parallel execution, branching, and fallbacks. Includes composition patterns, type safety, configuration threading, hierarchical agent delegation, middleware stacking, and debugging techniques.
 - [Middleware: Intercepting and Modifying Execution](middleware.md) - Middleware composability in LangChain agents: request/response interceptors that modify model execution, validate inputs, cache prompts, and add features. Covers composition order, writing custom middleware, and partner-specific middleware.
 - [Model Initialization: init_chat_model Provider Routing](model-initialization.md) - How init_chat_model routes model identifiers to provider-specific implementations. Covers model identifier syntax, provider discovery, lazy module loading, _ConfigurableModel, model profiles, and capability detection.

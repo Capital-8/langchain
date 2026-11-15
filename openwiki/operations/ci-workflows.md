@@ -1,8 +1,11 @@
 ---
 type: "Operations Reference"
-title: "CI/CD Operations and Release Management"
-description: "Operational runbook for CI/CD workflows, troubleshooting, and release procedures."
-tags: [ci, cd, release, automation, github-actions, pypi]
+title: "CI/CD Workflows: Testing, Linting, and Releases"
+description: "Overview of GitHub Actions workflows for unit tests, integration tests, linting, and releases across the monorepo."
+tags: [ci, cd, release, automation, github-actions, pypi, testing, linting]
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-11-15T08:15:26.682Z
 sources:
   - id: openwiki-source-6445599f26c9a35886c1c46e
     resource: repo://.github/PULL_REQUEST_TEMPLATE.md
@@ -20,10 +23,7 @@ sources:
     resource: repo://.github/workflows/pr_labeler.yml
   - id: openwiki-source-12805fbf767dc2a3e238645e
     resource: repo://.github/workflows/pr_lint.yml
-generated: { by: "openwiki/0.5.0", at: "2026-11-13T08:16:35.902Z" }
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-13T08:16:35.902Z
+generated: { by: "openwiki/0.5.0", at: "2026-11-15T08:15:26.682Z" }
 ---
 
 
@@ -96,6 +96,8 @@ The script generates different Python version matrices per package type:
 - **libs/core**: Tests on Python 3.11, 3.12, 3.13, 3.14 (full matrix for foundational stability)
 - **All other packages** (including openai and perplexity): Tests on Python 3.11, 3.14 (reduced matrix to save CI time)
 
+**Minimum Dependency Testing:** Unit tests run twice per job—first with current locked versions (from `uv.lock`), then with minimum supported versions extracted from `pyproject.toml` constraints. This ensures packages work across their entire declared dependency range and catches breaking changes when developers accidentally rely on undeclared transitive dependencies.
+
 ### Pydantic Compatibility Testing
 
 For packages using Pydantic, the script:
@@ -119,7 +121,10 @@ Once the `build` job outputs the matrices, seven jobs run in parallel (if not em
 #### 2. Unit Test Job
 - Runs `_test.yml` reusable workflow
 - Matrix: `working-directory` × `python-version`
-- Executes `make tests` with unit test dependencies
+- **Two-phase testing:**
+  1. Install locked dependencies from `uv.lock`, run `make test`
+  2. Calculate minimum supported versions from `pyproject.toml`, force-reinstall at minimum, run tests again
+- Detects accidental dependencies on unreleased features or undeclared transitive packages
 
 #### 3. Pydantic Compatibility Tests
 - Runs `_test_pydantic.yml` reusable workflow
@@ -140,12 +145,32 @@ Once the `build` job outputs the matrices, seven jobs run in parallel (if not em
 #### 6. VCR Cassette Tests
 - Runs `_test_vcr.yml` reusable workflow
 - Only for packages with VCR cassettes: `libs/partners/openai`
-- Runs integration tests in playback-only mode (uses cached HTTP responses, no API keys)
-- Detects stale cassettes that don't match actual API responses
+- Runs integration tests in **playback-only mode**: VCR cassettes record HTTP request/response pairs, allowing tests to replay cached responses without making real API calls. No credentials or API keys needed.
+- **Purpose:** Detects stale cassettes (test input changes that cause cassette mismatches) before they reach live integration testing
+- **Recording:** Cassettes are recorded locally by developers with `VCR_RECORD_MODE=once` or `new_episodes`, then committed alongside test code
 
 #### 7. Release Option Validation
 - `check-release-options` job validates that `_release.yml` dropdown options match actual package directories
 - Ensures release workflow stays in sync with repository structure
+
+---
+
+## Test Layer Strategy: Unit, Integration, and VCR
+
+LangChain's test strategy balances speed, cost, and confidence across three layers:
+
+| Layer | Scope | Trigger | Speed | Cost | Credentials | Purpose |
+|-------|-------|---------|-------|------|-------------|---------|
+| **Unit Tests** | Single packages in isolation | Every PR | ~5 min | Free | None | Catch regressions in core logic |
+| **VCR Cassettes** | Integration tests with recorded API calls | Every PR for openai | ~2 min | Free | Fake key only | Detect stale test inputs before live API calls |
+| **Live Integration Tests** | Full workflows with real APIs | Daily (1 PM UTC) or manual | ~10 min | ~$50/day | Real API keys | Verify actual provider compatibility |
+
+**Trade-offs:**
+- Unit tests are fast but miss API contract changes
+- VCR tests catch stale test data cheaply but don't verify real API compatibility
+- Live tests are expensive but authoritative
+
+**Minimum Testing in PR CI:** Unit tests + Pydantic compatibility + VCR cassettes (for openai). Live integration tests run separately on schedule.
 
 ---
 
@@ -267,15 +292,16 @@ Infrastructure: `infra`, `deps`, `partners`, `docs`
 
 Runs daily integration tests against partner libraries using live API credentials. This workflow tests the full LangChain ecosystem—not just unit tests but real API interactions.
 
-**Trigger:** 
-- Daily at 1:00 PM UTC (scheduled via cron)
-- Manual trigger via `workflow_dispatch` with flexible library selection
+**Trigger Mechanisms:**
+- **Scheduled:** Daily at 1:00 PM UTC via cron schedule (`0 13 * * *`), runs on main repo only
+- **Manual:** `workflow_dispatch` allows triggering from any branch with custom parameters
+- **Security:** Only triggers on main repo (forks cannot run scheduled jobs, but can dispatch manually)
 
-**Key Features:**
-- Connects to real APIs: OpenAI, Anthropic, Fireworks, Groq, Mistral, XAI, Google Vertex AI, Google GenAI, AWS
-- Uses live repository secrets for API keys
-- Only runs on main repo (forks can trigger manually but don't run on schedule)
-- Supports exclude lists and Python version overrides
+**Controlling Test Scope:**
+- `working-directory` (dropdown): Select specific library or "all"
+- `working-directory-override` (string): Full path override (e.g., `libs/partners/partner-xyz`)
+- `exclude` (string): Comma-separated short names to drop from "all" run (e.g., `openai,anthropic`)
+- `python-version-override` (string): Override default matrix (e.g., `3.12` for single version)
 
 ### Matrix Configuration
 
@@ -292,19 +318,39 @@ Default libraries tested daily:
 
 **Python versions (default):** 3.11, 3.14
 
-**Manual run options:**
-- Run all libraries or select one
-- Exclude specific libraries from "all" runs
-- Override Python version matrix
+**Concurrency:** Same-library shards serialize across workflow runs (keyed per working-directory + python-version) to prevent multiple runs from racing against shared API credentials and hitting rate limits.
 
-### Integration Test Execution
+### Integration Test Execution & Credential Management
 
 Per library:
-1. Check out repository
-2. Set up Python and UV
-3. Sync dependencies with `uv sync --group test --group test_integration`
-4. Execute `make integration_tests` (defined in each package's Makefile)
-5. Live API keys injected from repository secrets
+
+1. **Check out repositories**
+   - Main monorepo: langchain
+   - External libraries (google-genai, google-vertexai, aws): checked out from separate repos
+
+2. **Install dependencies**
+   - `uv sync --group test --group test_integration` pulls test dependencies
+   - For external packages: overlay local editable installs from current branch to test against unreleased code
+
+3. **Build LangSmith metadata** (for tracing)
+   - Constructs JSON metadata with GitHub run info, commit SHA, workflow name, Python version
+   - Routes traces to LangSmith project for failure diagnosis
+
+4. **Inject live credentials** from repository secrets (environment-scoped):
+   - **LangSmith:** `LANGSMITH_API_KEY`, `LANGSMITH_GATEWAY`, `LANGSMITH_GATEWAY_API_KEY` (tracing service)
+   - **Model providers:** `OPENAI_API_KEY`, `ANTHROPIC_FILES_API_*`, `GROQ_API_KEY`, `MISTRAL_API_KEY`, `FIREWORKS_API_KEY`, `XAI_API_KEY`, etc.
+   - **Cloud platforms:** Google Cloud credentials (via `GOOGLE_CREDENTIALS`), AWS credentials (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
+   - **Databases & Search:** MongoDB, Elasticsearch, Astra DB, etc.
+   - **WARNING:** All secrets available to every matrix job for simplicity; only use for trusted code.
+
+5. **Execute `make integration_tests`**
+   - Runs `pytest` with integration test markers against live APIs
+   - Uses real request/response cycles (not mocked)
+   - Verifies end-to-end workflows with production endpoints
+
+6. **Verify clean working directory**
+   - Ensures no test-generated files remain uncommitted
+   - Catches accidental state mutations
 
 ---
 
@@ -399,10 +445,12 @@ Manually triggered workflow that builds, tests, and publishes LangChain packages
    - Execute `make tests` against the installed package
 
 6. **Test against minimum supported dependency versions**
-   - Extracts minimum versions from `pyproject.toml` using `get_min_versions.py`
-   - Force-reinstalls dependencies at minimum supported versions
+   - Extracts minimum versions from `pyproject.toml` using `get_min_versions.py` script
+   - Force-reinstalls dependencies at their **minimum supported versions** (as declared in pyproject.toml constraints)
    - Runs tests again: `make tests PYTEST_EXTRA="-q -k 'not test_serdes'"`
    - Skips `test_serdes` (serialization behavior may differ across versions)
+   - **Purpose:** Ensures package documentation is accurate—users installing with your declared constraints won't hit missing methods or API changes
+   - **Related:** PR CI runs minimum version tests via the `_test.yml` reusable workflow in every PR; release job repeats this with the built wheel to guarantee both current and released packages pass
 
 7. **Run integration tests** (partner packages only)
    - Only runs if `EFFECTIVE_WORKING_DIR` starts with `libs/partners/`

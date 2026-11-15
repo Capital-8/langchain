@@ -1,11 +1,11 @@
 ---
 type: API Reference
-title: Streaming API Reference
-description: Core streaming APIs for incremental output delivery via BaseChatModel.stream() and astream(), message chunk composition, ChatModelStream projections, and callback integration.
-tags: [streaming, token-streaming, api-reference, chat-models, callbacks, AIMessageChunk, ChatModelStream]
+title: Streaming and Async Patterns
+description: Core streaming APIs across Runnables and chat models, including stream/astream entry points, event types, async iteration patterns, message chunk composition, and protocol-level event handling.
+tags: [streaming, async, iterator, astream, stream, events, chat-models, runnables]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-11-13T08:16:35.902Z
+    at: 2026-11-15T08:15:26.682Z
 sources:
   - id: openwiki-source-c9313cf42f0120d86b20245f
     resource: repo://libs/core/langchain_core/callbacks/base.py
@@ -15,22 +15,101 @@ sources:
     resource: repo://libs/core/langchain_core/language_models/chat_models.py
   - id: openwiki-source-77dc1fb726463969f9d53658
     resource: repo://libs/core/langchain_core/messages/ai.py
-generated: { by: "openwiki/0.5.0", at: "2026-11-13T08:16:35.902Z" }
+  - id: openwiki-source-a1981e868973f6fd7f71e12e
+    resource: repo://libs/core/langchain_core/runnables/base.py
+generated: { by: "openwiki/0.5.0", at: "2026-11-15T08:15:26.682Z" }
 ---
 
 ## Overview
 
-This reference documents the streaming APIs in LangChain Core that enable incremental token-by-token output delivery from language models. For conceptual documentation and integration patterns, see [Streaming: Token-by-Token Output](/openwiki/streaming.md).
+This reference documents streaming and asynchronous patterns in LangChain Core. Streaming enables incremental, real-time output delivery from any `Runnable`, with specialized support in chat models for token-by-token delivery and tool call finalization.
 
-The streaming system centers on three concerns:
+The streaming system operates at two levels:
 
-1. **Entry Points** – `BaseChatModel.stream()` and `astream()` for synchronous and asynchronous token iteration
-2. **Message Chunks** – `AIMessageChunk` and related chunk types that represent partial message updates
-3. **Stream Objects** – `ChatModelStream` and `AsyncChatModelStream` for protocol-level event handling and typed projections
+1. **Runnable Protocol** (`Runnable.stream()` / `Runnable.astream()`) – Generic streaming for any Runnable, yielding complete outputs one at a time as they are produced
+2. **Chat Model Streaming** (`BaseChatModel.stream()` / `BaseChatModel.astream()`) – Specialized token/chunk streaming with callback events and chunk composition
+3. **Protocol Events** (`Runnable.astream_events()` with `version="v3"`) – Structured event streaming with typed projections and content-block-level granularity
 
 ---
 
-## Streaming Entry Points
+## Runnable Streaming
+
+### Runnable.stream()
+
+**Location**: `repo://libs/core/langchain_core/runnables/base.py#L1258-L1277`
+
+Synchronous streaming entry point that yields outputs as they are produced.
+
+```python
+def stream(
+    self,
+    input: Input,
+    config: RunnableConfig | None = None,
+    **kwargs: Any | None,
+) -> Iterator[Output]:
+    """Yield outputs as they are produced."""
+```
+
+**Behavior**:
+
+- **Default implementation**: Calls `invoke()` once and yields a single result. This ensures all Runnables provide a streaming interface even if not optimized for it.
+- **Subclass optimization**: Subclasses override to yield partial outputs as they are produced (e.g., chat models streaming tokens, chains streaming intermediate results).
+- **Configuration threading**: Accepts optional `RunnableConfig` for tags, metadata, callbacks, and other execution options.
+- **Callback integration**: Fires callback events for each yielded chunk; streaming callbacks (if attached) trigger this method automatically.
+
+**Usage**:
+
+```python
+# Generic Runnable
+for output in runnable.stream(input):
+    print(output)
+
+# Chat model (yields AIMessageChunk objects)
+for chunk in model.stream(messages):
+    print(chunk.content, end="", flush=True)
+```
+
+---
+
+### Runnable.astream()
+
+**Location**: `repo://libs/core/langchain_core/runnables/base.py#L1279-L1298`
+
+Asynchronous variant of `stream()`, mirroring the synchronous logic using async/await.
+
+```python
+async def astream(
+    self,
+    input: Input,
+    config: RunnableConfig | None = None,
+    **kwargs: Any | None,
+) -> AsyncIterator[Output]:
+    """Yield outputs asynchronously as they are produced."""
+```
+
+**Behavior**:
+
+- **Default implementation**: Calls `ainvoke()` once and yields a single result asynchronously.
+- **Subclass optimization**: Subclasses override for native async streaming (e.g., async generators, async HTTP iterators).
+- **Fallback to sync**: If a subclass implements only `stream()`, the default `astream()` can fall back via `run_in_executor()`.
+
+**Usage**:
+
+```python
+# Generic Runnable
+async for output in runnable.astream(input):
+    print(output)
+
+# Chat model (yields AIMessageChunk objects)
+async for chunk in model.astream(messages):
+    print(chunk.content, end="", flush=True)
+```
+
+---
+
+## Chat Model Streaming
+
+Chat models implement specialized streaming with fine-grained token delivery and tool call support.
 
 ### BaseChatModel.stream()
 
@@ -51,22 +130,32 @@ def stream(
 
 **Behavior**:
 
-- Checks `_should_stream(async_api=False)` to determine if streaming is implemented and enabled
-- If streaming is not available, delegates to `invoke()` and yields a single result cast to `AIMessageChunk`
-- Configures callbacks via `CallbackManager.configure()`
-- Fires `on_chat_model_start` before beginning iteration
-- For each chunk from `_stream()`:
-  - Sets a unique run ID (prefixed with `LC_ID_PREFIX`) if not already present
-  - Computes response metadata via `_gen_info_and_msg_metadata()`
-  - Transforms content to content blocks if `output_version="v1"`
-  - Fires `on_llm_new_token` with the token and full chunk object
-  - Yields the chunk immediately
-  - Accumulates the chunk in memory for later merging
-- Yields a final empty chunk with `chunk_position="last"` if not already yielded by the model; this signals stream completion and triggers tool call finalization
-- On success, fires `on_llm_end` with a merged result containing all accumulated chunks
-- On exception, fires `on_llm_error` with partial accumulation before re-raising
+- **Streaming Decision**: Checks `_should_stream(async_api=False)` to determine if streaming is implemented and enabled
+- **Fallback**: If streaming is not available, delegates to `invoke()` and yields a single result cast to `AIMessageChunk`
+- **Callback Setup**: Configures callbacks via `CallbackManager.configure()`
+- **Event Lifecycle**:
+  - Fires `on_chat_model_start` before beginning iteration
+  - For each chunk from `_stream()`:
+    - Sets a unique run ID (prefixed with `LC_ID_PREFIX`) if not already present
+    - Computes response metadata via `_gen_info_and_msg_metadata()`
+    - Transforms content to content blocks if `output_version="v1"`
+    - Fires `on_llm_new_token` with the token and full chunk object
+    - Yields the chunk immediately
+    - Accumulates the chunk in memory for later merging
+  - Yields a final empty chunk with `chunk_position="last"` if not already yielded by the model; this signals stream completion and triggers tool call finalization
+  - On success, fires `on_llm_end` with a merged result containing all accumulated chunks
+  - On exception, fires `on_llm_error` with partial accumulation before re-raising
 
 **Rate Limiting**: Acquires a permit from `self.rate_limiter` (if attached) before beginning; blocks until available.
+
+**Parameters**:
+
+- `input`: Messages, message dict, or other model input
+- `config`: Execution configuration (tags, metadata, callbacks, run ID, etc.)
+- `stop`: Optional stop sequences
+- `**kwargs`: Additional model-specific arguments
+
+**Returns**: Iterator of `AIMessageChunk` objects
 
 ---
 
@@ -194,9 +283,11 @@ All inherit from `BaseMessageChunk` and support merging via `+`.
 
 ## Protocol-Level Streaming: ChatModelStream
 
+Protocol-level streaming (`astream_events(version="v3")`) enables structured, content-block-centric event handling with typed projections for text, reasoning, tool calls, and usage.
+
 ### ChatModelStream
 
-**Location**: `repo://libs/core/langchain_core/language_models/chat_model_stream.py#L557+`
+**Location**: `repo://libs/core/langchain_core/language_models/chat_model_stream.py#L1190-L1300`
 
 Synchronous wrapper for protocol-level event handling and typed projections. Returned by `BaseChatModel.stream_events(version="v3")`.
 
@@ -271,7 +362,7 @@ for event in stream:
 
 ### AsyncChatModelStream
 
-**Location**: `repo://libs/core/langchain_core/language_models/chat_model_stream.py#L557+`
+**Location**: `repo://libs/core/langchain_core/language_models/chat_model_stream.py#L1346-L1454`
 
 Asynchronous variant of `ChatModelStream`. Returned by `BaseChatModel.astream_events(version="v3")`.
 
@@ -309,6 +400,72 @@ final_text = await stream.text
 final_calls = await stream.tool_calls
 final_message = await stream.output
 ```
+
+---
+
+## Async Iteration and Projections
+
+### SyncProjection
+
+**Location**: `repo://libs/core/langchain_core/language_models/chat_model_stream.py#L219-L282`
+
+Synchronous iterable of accumulated deltas with pull-based backpressure.
+
+**Methods**:
+
+- **`__iter__()`**: Create a new cursor at position 0 that pulls from the producer via `_request_more` until exhausted or an error occurs
+- **`get()`**: Drain the projection and return the final accumulated value; blocks internally until completion
+- **`set_start(cb)`**: Install a lazy-start callback invoked on first consumption
+- **`set_request_more(cb)`**: Install the pull callback the iterator uses to drive the source; callback returns `True` when a new event was produced, `False` when exhausted
+
+**Multiple independent iterators**: Each call to `__iter__()` creates a new cursor; all replay the full delta buffer from the start.
+
+**Backpressure Pattern**:
+
+The projection does not precompute or buffer all events. Instead, it uses pull-based backpressure: the iterator calls `_request_more()` on-demand to drive the source, allowing the producer to control pacing and avoid overload.
+
+---
+
+### SyncTextProjection
+
+**Location**: `repo://libs/core/langchain_core/language_models/chat_model_stream.py#L284-L338`
+
+String-specialized sync projection for `.text` and `.reasoning` projections. Enforces string-only deltas and final values.
+
+**Additional Methods**:
+
+- **`__str__()`**: Drain and return the full accumulated string
+- **`__bool__()`**: Return whether any deltas have been pushed
+- **`__repr__()`**: Return repr of accumulated text so far
+
+---
+
+### AsyncProjection
+
+**Location**: `repo://libs/core/langchain_core/language_models/chat_model_stream.py#L345-L437`
+
+Async iterable of accumulated deltas that is also awaitable for the final value. Uses `asyncio.Event` for inter-task signaling.
+
+**Methods**:
+
+- **`__aiter__()`**: Return an async iterator over deltas; each iterator is a new cursor at position 0
+- **`__await__()`**: Await the final accumulated value; awakens on `push()` or `complete()`
+- **`set_start(cb)`**: Install a lazy-start callback invoked on first consumption
+- **`set_arequest_more(cb)`**: Install an async pull callback; returns `True` when new event produced, `False` when exhausted
+
+**Dual consumption**: Consumers can iterate deltas, await the final value, or both simultaneously via independent cursors on the shared replay buffer.
+
+**Event-Driven Pattern**:
+
+Unlike `SyncProjection`'s pull-based backpressure, `AsyncProjection` uses event-driven signaling via `asyncio.Event`. Multiple async tasks can await the same projection, and all are awakened when new data arrives or completion is signaled.
+
+---
+
+### AsyncTextProjection
+
+**Location**: `repo://libs/core/langchain_core/language_models/chat_model_stream.py#L514-L549`
+
+String-specialized async projection. Enforces string-only deltas; `__await__` returns string or empty string if unfinished.
 
 ---
 
@@ -376,60 +533,6 @@ Base class for handlers that observe token-level callbacks during `stream()` / `
 **Location**: `repo://libs/core/langchain_core/tracers/_streaming.py`
 
 Base class for handlers that observe protocol-level events. Routes streaming through the v2 event path in `_should_use_protocol_streaming()`.
-
----
-
-## Projection Base Classes
-
-### SyncProjection
-
-**Location**: `repo://libs/core/langchain_core/language_models/chat_model_stream.py#L219-L282`
-
-Synchronous iterable of accumulated deltas with pull-based backpressure.
-
-**Methods**:
-
-- **`__iter__()`**: Create a new cursor at position 0 that pulls from the producer via `_request_more` until exhausted or an error occurs
-- **`get()`**: Drain the projection and return the final accumulated value; blocks internally until completion
-- **`set_start(cb)`**: Install a lazy-start callback invoked on first consumption
-- **`set_request_more(cb)`**: Install the pull callback the iterator uses to drive the source; callback returns `True` when a new event was produced, `False` when exhausted
-
-**Multiple independent iterators**: Each call to `__iter__()` creates a new cursor; all replay the full delta buffer from the start.
-
-### SyncTextProjection
-
-**Location**: `repo://libs/core/langchain_core/language_models/chat_model_stream.py#L284-L338`
-
-String-specialized sync projection for `.text` and `.reasoning` projections. Enforces string-only deltas and final values.
-
-**Additional Methods**:
-
-- **`__str__()`**: Drain and return the full accumulated string
-- **`__bool__()`**: Return whether any deltas have been pushed
-- **`__repr__()`**: Return repr of accumulated text so far
-
----
-
-### AsyncProjection
-
-**Location**: `repo://libs/core/langchain_core/language_models/chat_model_stream.py#L345-L437`
-
-Async iterable of accumulated deltas that is also awaitable for the final value. Uses `asyncio.Event` for inter-task signaling.
-
-**Methods**:
-
-- **`__aiter__()`**: Return an async iterator over deltas; each iterator is a new cursor at position 0
-- **`__await__()`**: Await the final accumulated value; awakens on `push()` or `complete()`
-- **`set_start(cb)`**: Install a lazy-start callback invoked on first consumption
-- **`set_arequest_more(cb)`**: Install an async pull callback; returns `True` when new event produced, `False` when exhausted
-
-**Dual consumption**: Consumers can iterate deltas, await the final value, or both simultaneously via independent cursors on the shared replay buffer.
-
-### AsyncTextProjection
-
-**Location**: `repo://libs/core/langchain_core/language_models/chat_model_stream.py#L514-L549`
-
-String-specialized async projection. Enforces string-only deltas; `__await__` returns string or empty string if unfinished.
 
 ---
 
@@ -580,7 +683,7 @@ When `output_version="v1"`, `stream()` and `astream()` transform content blocks 
 
 ## Related Concepts
 
-- **[Streaming: Token-by-Token Output](/openwiki/streaming.md)** – Conceptual documentation, integration patterns, and memory tradeoffs
-- **[Callbacks](/openwiki/reference/callbacks.md)** – Callback handler architecture and lifecycle
 - **[Runnables](/openwiki/reference/runnables.md)** – Runnable composition and streaming through chains
+- **[Chat Models](/openwiki/reference/chat-models.md)** – Chat model API and specializations
+- **[Callbacks](/openwiki/reference/callbacks.md)** – Callback handler architecture and lifecycle
 - **[Messages](/openwiki/reference/messages.md)** – Message types and chunk composition

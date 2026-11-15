@@ -1,20 +1,100 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:9b30d4ca85408b5db3c960b7e9afb5577f51a31b9f8a82955f046a0164eb247a",
+  "pageVersion": "sha256:7daa79f3a80de5fc37c5a781f2c1a25c5a81d5893d636c08fd74f47403950ae8",
   "claims": [
     {
       "id": "claim_440d269da9d7405796eb025f9a99de80",
       "statement": "The LangChain message system provides a type hierarchy of message classes including BaseMessage, HumanMessage, AIMessage, SystemMessage, ToolMessage, and related variants defined in langchain_core.messages, implementing the fundamental data contract for communication between applications and language models.",
       "evidence": [
         {
-          "resource": "repo://libs/langchain/langchain_classic/schema/messages.py#L1-L23",
-          "version": "repo-lines-v1:sha256:227492d308a6db553ef16d5ee52d126ee27773185b44c9136a232964b6a2c218:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA1Y2Y3N2RkZDVhMzllYzk3NGU1ZWQxYmU4YTE4MTNlMzZhNzY5N2ZlNTE0MWU2MTFkZThmMDc3OTY3NzU1NTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhZmJhMDUyN2MzOTUzYzRiNmUwZTViNTczOWJhODM2MTJmODA1M2JjZGM5NDY2NzMwMTkzY2QxZDU5MGI0MDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVhMTg4ZjQ0MWYzN2I5M2IzYzNmOTA2MTc2OTEwZTgzNTAyMWM5ZGJmODU5YTZmODcyOWQ3OGMyYTI0NGFjZDgifQ"
+          "resource": "repo://libs/core/langchain_core/messages/ai.py#L160-L184",
+          "version": "repo-lines-v1:sha256:ab544c9f30f60ef9431f7eea9ecfbf638910dead0cd16285b7937e06ed8d1aed:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhZGMyYWFlNjZjOGFhMTliNDE4MjA1ODFlYzg4MmY2NWRmOTljMzE3MWE4M2Q2ZDk3MTQyOTlmYjAyM2I5NzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAyYjI1NzhkODVmMDU0N2ZhOTE3ZGE3YjE4ZDIwNzg5OTE4MjlhNTM4MmM3OTEyOGJlMTZmNmYxMDg4ZjdhYjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ5OTc4YjNmODQ0MDBhNThiOWRiNzkwM2ZjNGY2MWY2NGQ0NmFhNTFhNDAxMTEwYjM1NTYzNTJkMmQzZDk1ZWQifQ"
+        },
+        {
+          "resource": "repo://libs/core/langchain_core/messages/base.py#L92-L140",
+          "version": "repo-lines-v1:sha256:44b3e3133bcab8379ea370f257efe995623a1eb6ebac3ba9d5c35c32c32a71cc:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2YWFlYjBkNzJlNzU4NDhiYWVmMDliMGJiMzU0MDY4MjJhZmFmYTQ4YzEwMWU2NDc5OTE4Yjg3YWFiOTU2YjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQyOGVlZTRhYzUwYzgwY2I3ZTU5ZGUxNmEwZWM4MjllZGViYjRmNTJhZDkzMjk2NzNmN2JiMTA4NDBjODlkMTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiNzdhOGQ1ZTdhMzEyMjI0YjVjODg5MmNhYmY5NTQ4OTEzZmM5ZjMwN2Q1NmI2NjYyMGVlYjE1MzA4NzM3ZjIifQ"
+        },
+        {
+          "resource": "repo://libs/core/langchain_core/messages/human.py#L9-L30",
+          "version": "repo-lines-v1:sha256:9d131027d3f0638f54b1e891cc9b9179dbf47bc32fdbc409f6d2f43802d34267:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhNWNkNmZmM2Q1NTA3NGU1NTQzODlhY2Q0ODc5MDJhNjljYTZiNzdmM2RjZWI3MDMwM2E4ZmYxMDBhMzVhMzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwOTU2ZDVlYTkxODg1ZDk5NmQ3OGEwOTJiNzY5NzczYTFiYTA1YTY5MGM5NWZmNTgxNjFlNWMyNzdmZGM4ZmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQyY2QzODQ3NzZjM2FlM2U4ZGZmOTc0OTlkMmRhNmJmYTlkYzY1MGI5OGY1NmM5M2U0YzM1NTNmNGFiZjY2M2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ5NzFmMTIxYTAyNjUyNGE4MTk0MmY4MTRiMmFjMzY2YWI1MzVjNTkyNDZjODNkNmQwODdlZGUwNzhkMGIzMzAifQ"
+        },
+        {
+          "resource": "repo://libs/core/langchain_core/messages/system.py#L9-L30",
+          "version": "repo-lines-v1:sha256:011d44a41313c6e6daa8f5b6d7a9a6dee0dd71ffad480599f06a27d292e8bd6f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU4MTk2NTMxMjU3ZTg0ZGE3NTM2YTAzZDgxZGE4YmNkZjU1Y2QzMzFiZTFlMTJhYzc0ZTE1MTAyNDVjNGIzN2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwOTU2ZDVlYTkxODg1ZDk5NmQ3OGEwOTJiNzY5NzczYTFiYTA1YTY5MGM5NWZmNTgxNjFlNWMyNzdmZGM4ZmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQyY2QzODQ3NzZjM2FlM2U4ZGZmOTc0OTlkMmRhNmJmYTlkYzY1MGI5OGY1NmM5M2U0YzM1NTNmNGFiZjY2M2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ5NzFmMTIxYTAyNjUyNGE4MTk0MmY4MTRiMmFjMzY2YWI1MzVjNTkyNDZjODNkNmQwODdlZGUwNzhkMGIzMzAifQ"
+        },
+        {
+          "resource": "repo://libs/core/langchain_core/messages/tool.py#L26-L89",
+          "version": "repo-lines-v1:sha256:655ae9d5e895e8ee0ac05a0ba2a71b6bac24bd58abe0c387dde0cdf3d256464a:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhYWYzYjdkMDU2Njk3ZDEyZDRhYWZiNzU5ODY1M2IwZTViNThiNDgxMGZiMGViNTMxMDc1N2VjMDZlNzQwNDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAyYjI1NzhkODVmMDU0N2ZhOTE3ZGE3YjE4ZDIwNzg5OTE4MjlhNTM4MmM3OTEyOGJlMTZmNmYxMDg4ZjdhYjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY0MGFkZjY0MWFjNjE0MTAwZmE2MWFiYmQzYjAzYjFkNjRlNDFiNDMyMmI2NzVjYTI2NGU5OWMzMjg3MTczYjMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f8ad1d27c87d4d6a89bb5ff80f999701",
+      "statement": "AIMessage encapsulates model responses with support for tool calls, invalid tool calls, and token usage metadata; tool_calls contain parsed arguments as dicts while tool_call_chunks accumulate JSON string fragments that are merged during streaming based on matching index values.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/messages/ai.py#L104-L183",
+          "version": "repo-lines-v1:sha256:6b3284be2aafa24574ce45a1366e0e2142e96113f697c5414c01efa89e299fe5:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZiOTc4ZWY4M2UzY2Y5NmNiNGI5NzM3MTRmZWRhOWE1M2QwMWRiMWI5Y2Q0MjFmOGI2YTAyNDI0MTkyNTkwZjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyZjBiYzVjNTMxOTM3OTQxM2Y3NzRhZGEyMWJiNWVhZjFkODAwYzY1NTFkMjA0M2M3OThiZTQxNjI2OTUxZWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAyYjI1NzhkODVmMDU0N2ZhOTE3ZGE3YjE4ZDIwNzg5OTE4MjlhNTM4MmM3OTEyOGJlMTZmNmYxMDg4ZjdhYjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ5NzFmMTIxYTAyNjUyNGE4MTk0MmY4MTRiMmFjMzY2YWI1MzVjNTkyNDZjODNkNmQwODdlZGUwNzhkMGIzMzAifQ"
+        },
+        {
+          "resource": "repo://libs/core/langchain_core/messages/content.py#L247-L370",
+          "version": "repo-lines-v1:sha256:15549318f20b7e97709b04f745fee5e4efc230c165cd9ecc9ab3c72a38d70469:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlMWEwNmRmOWUxMDQwMDU4MzQwMWQxMTRhYjcxNDExMmFmNDM4Y2IyYTM4OGE0NjJkN2EwOGNlYTViZmUwOGNkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5NzY3YjNiYTA1MmJhMzhhZTMyMWUzY2ZkN2NhZmNjNGE1OTczOWYzYjE3OWUxODQ0OTNiNGJjODJhMjUyNTQ0IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4MTM1OTkxNTdkZDg5MjRiZGI5ODMxZTEwZTVjZjI1OWMxY2M0ZDRmNjRlZDg0ZTFmMjMyOTM0NTE0NTJhYTlmIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_413fdf804a2c4574b31e90a267391e52",
+      "statement": "UsageMetadata is a TypedDict containing input_tokens, output_tokens, and total_tokens counts, with optional InputTokenDetails and OutputTokenDetails breakdowns for tracking audio, cache, and reasoning tokens separately.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/messages/ai.py#L38-L158",
+          "version": "repo-lines-v1:sha256:eea14ea358d4b655600934ba984d66a3e86447d441554692d178fe647e7e016f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjMjQzZDZjODkwMDNmMDZhMDg5MGFhMDZkMTc2NzEyZjRkNTQxYWQzYjUwYWI0ZmRhZWQyNjQ2MWQ5YmJjZjYwIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI2MjAwOTdlNGFhNTAwNjhiYTE1N2Y5YTI3MzlmYWQ4Njk5NWUxZTBjZGNjZGFkYzU4OTdjMjAzNGM3NGQzZWZhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJhOTAxZjFhMGExNjM3NDhmOTM3Y2ViMWJhZjgzNzE3ZjAyYzAwODQyYWU2NTQyYTllNmVjY2M5OGQwOWQ1M2UzIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_c7500ed6d7394b8c835555bfff2b0db2",
+      "statement": "Content blocks are a union type spanning text, reasoning, refusal, tool calls, multimodal data (image, audio, video, plaintext, file), server-side tool execution constructs, non-standard provider blocks, and annotations; each block is a TypedDict with a type discriminator.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/messages/content.py#L207-L910",
+          "version": "repo-lines-v1:sha256:07a568b1b22a4859bd6981d874de6ec390381c7e171656df7cc602f2e0d6c7b4:eyJzZWxlY3RlZExpbmVDb3VudCI6NzA0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5Mzc0NWI4ZTkxYmJjODU4NWNkOGNlNWJlZTJmNzNjYTZjNGZmMmIzYzJjYWE4NjNlNmYyY2VhM2YxMTczZjJlIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJhMzAzZWNkZDRhNGQxMGYxOWM3M2ZkNDJmZDEyNDM3ZmQzMzU0YTgyNjgxNjA1ZGE1MjU1YTk3YTM5MDY4ZGJiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI1ZWNmZTZhMjUyYWQ1NjZhYjNjODdlMDJmYjQxYWEwMDJmOTQ5NTRiMTdiMjAwN2M0NjNkM2I4MmRiMTRhMTVjIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4MWE5NjIyNTYxNTk1YjgxYjU0MWU0YmYzY2U5OGQ3MTZjODMwYzlkY2Y2YjJlY2E5NGJlNzFiZDdjY2E4YzYxIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_0a618ff86d0f4673b0a55b790a6e668b",
+      "statement": "NotificationMetadata marks HumanMessages as system-generated via add_notification_metadata(), storing source and optional data in additional_kwargs as lc_source and lc_data keys; these keys are excluded from model API calls by integrations and can be retrieved with get_notification_metadata().",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/messages/notification.py#L11-L92",
+          "version": "repo-lines-v1:sha256:f345c3723deecb9102380dc9562a6f2a71058516eea7eb8a697b2f50690ccf57:eyJzZWxlY3RlZExpbmVDb3VudCI6ODIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5YWE1ZTA1NzgyNGZlZTllMjE0OWFlZDAzYmQzNzYxNjQ5ZmRjZWYxOGEyYjY1NDhkNWU5MTJlYmZmNjdkMTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2MWRiMjFkN2Y3OWI5ZjhiNmFlNzQ3MDQ1Nzg0ZWI3M2YxMjRmZDU3ZTZjOTkxMTQyNjkyNTAxYmE3YzExNGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwZTg1YTZjMjY4NmI0YWNjY2JjOTZjYjRlZDA0MzA0MDlhZjQ3NzA0MzA5ZDdkMzNlYmY5NTU0YTlmYThkMmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4621c7f3bc0646888a45b37e1b43ebd3",
+      "statement": "ToolMessage represents tool execution results with tool_call_id linking it to an AIMessage tool call, optional artifact field for data not sent to model, and status field indicating success or error.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/messages/tool.py#L26-L89",
+          "version": "repo-lines-v1:sha256:655ae9d5e895e8ee0ac05a0ba2a71b6bac24bd58abe0c387dde0cdf3d256464a:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhYWYzYjdkMDU2Njk3ZDEyZDRhYWZiNzU5ODY1M2IwZTViNThiNDgxMGZiMGViNTMxMDc1N2VjMDZlNzQwNDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAyYjI1NzhkODVmMDU0N2ZhOTE3ZGE3YjE4ZDIwNzg5OTE4MjlhNTM4MmM3OTEyOGJlMTZmNmYxMDg4ZjdhYjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY0MGFkZjY0MWFjNjE0MTAwZmE2MWFiYmQzYjAzYjFkNjRlNDFiNDMyMmI2NzVjYTI2NGU5OWMzMjg3MTczYjMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6d4d0f3b27744fca9edbd31764b122f8",
+      "statement": "Content blocks provide factory functions (create_text_block, create_image_block, etc.) that auto-generate IDs and validate required arguments, simplifying construction of typed multimodal content.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/messages/content.py#L979-L1084",
+          "version": "repo-lines-v1:sha256:3c997c2be2c1ec3cdb40a43a497d5d234f6bff80229d7fcaa5e019a0b49dafa5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjMDQyMzBiZDcwOTE2ZDQ2YzIyYzRkZTY4YjFjZmQxMWUzYWFjZjZiOWMyZjJhNjcxYjBkZjhjNTM0MTE5NWIxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlMGIyMWJmODk1ZmFlMmQ3MzkyMGQ5MzE3OGNmZDU4NDFjZGY4Zjk1MjQ1MTZjOGE1NjU4NDM2YTRhYzQ4ZjNiIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJkZDBhYTI3ZGU0ZjU0ODEwYWYyZGM1N2E0Njc0MDc4Y2E2ZmYzMjgzMDIzZDE3MzE0MDA4NGI5OGY5MTRhOGEwIn0"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-13T08:16:35.902Z"
+    "at": "2026-11-15T08:15:26.682Z"
   }
 }

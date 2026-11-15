@@ -34,10 +34,10 @@ sources:
     resource: repo://libs/partners/README.md
   - id: openwiki-source-7da6afe7fe64c6589cf1fed0
     resource: repo://libs/README.md
-generated: { by: "openwiki/0.5.0", at: "2026-11-13T08:16:35.902Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-11-15T08:15:26.682Z" }
 verified:
   - by: openwiki/0.5.0
-    at: 2026-11-13T08:16:35.902Z
+    at: 2026-11-15T08:15:26.682Z
 ---
 
 ## Overview
@@ -61,7 +61,7 @@ graph TB
     User["User Applications"]
     
     User -->|imports from| LangChain["langchain<br/>(Orchestration & Agents)<br/>v1.5.0"]
-    User -->|may use directly| Core["langchain-core<br/>(Base Abstractions)<br/>v1.8.0"]
+    User -->|may use directly| Core["langchain-core<br/>(Base Abstractions)<br/>v1.8.1"]
     
     LangChain -->|depends on| Core
     LangChain -->|depends on| LangGraph["LangGraph<br/>(State Graph Engine)"]
@@ -140,7 +140,7 @@ graph TB
 - **Tools**: Provider-specific tool wrappers and utilities.
 - **Structured Output Support**: Provider-specific strategies for enforcing output schemas (e.g., function calling, JSON mode).
 
-**Examples**: langchain-openai, langchain-anthropic, langchain-ollama, langchain-groq, langchain-mistralai
+**Examples**: langchain-openai, langchain-anthropic, langchain-ollama, langchain-groq, langchain-mistralai, langchain-deepseek, langchain-xai, langchain-openrouter, langchain-perplexity, and others maintained by LangChain or third-party providers
 
 **Release policy**: Partner packages are versioned independently. A partner package update does not require updates to langchain or langchain-core, and vice versa. Each partner manages its own API version pinning and compatibility.
 
@@ -292,7 +292,7 @@ The core layer (langchain-core) is intentionally minimal and stable. Orchestrati
 
 ## Versioning and Release Policy
 
-- **langchain-core** (`v1.8.0`): Stable base abstractions. Major version bumps are rare and announced in advance. Deprecations carry multiple minor versions of notice. This is the "least-moving" part of the ecosystem.
+- **langchain-core** (`v1.8.1`): Stable base abstractions. Major version bumps are rare and announced in advance. Deprecations carry multiple minor versions of notice. This is the "least-moving" part of the ecosystem.
 
 - **langchain** (`v1.5.0`): Main user-facing package. Minor versions may add new agent patterns, middleware types, or orchestration improvements. Patch versions fix bugs. Requires specific langchain-core version (e.g., `>=1.8.0,<2.0.0`).
 
@@ -376,14 +376,16 @@ Tools are bound to agents at creation time and made available to the model for i
 
 ## Dependency Summary
 
-| Package | Depends On | Role |
-|---------|-----------|------|
-| **langchain-core** | langsmith, httpx, tenacity, pydantic, PyYAML | Base abstractions; stable |
-| **langchain** | langchain-core, langgraph, pydantic | Agent orchestration; user-facing |
-| **langchain-classic** | langchain-core, langchain-text-splitters, pydantic | Legacy chains and community re-exports |
-| **langchain-openai** | langchain-core, openai SDK | OpenAI integration (ChatOpenAI, embeddings) |
-| **langchain-anthropic** | langchain-core, anthropic SDK | Anthropic integration (ChatAnthropic) |
-| **langchain-ollama** | langchain-core, ollama SDK | Ollama integration (ChatOllama) |
-| **langchain-groq** | langchain-core, groq SDK | Groq integration (ChatGroq) |
+| Package | Depends On | Role | Version |
+|---------|-----------|------|---------|
+| **langchain-core** | langsmith, httpx, tenacity, pydantic, PyYAML | Base abstractions; stable | v1.8.1 |
+| **langchain** | langchain-core, langgraph, pydantic | Agent orchestration; user-facing | v1.5.0 |
+| **langchain-classic** | langchain-core, langchain-text-splitters, pydantic | Legacy chains and community re-exports | v1.0.8 |
+| **langchain-openai** | langchain-core, openai SDK | OpenAI integration (ChatOpenAI, embeddings) | v1.8.0 |
+| **langchain-anthropic** | langchain-core, anthropic SDK | Anthropic integration (ChatAnthropic) | v1.7.10 |
+| **langchain-ollama** | langchain-core, ollama SDK | Ollama integration (ChatOllama) | — |
+| **langchain-groq** | langchain-core, groq SDK | Groq integration (ChatGroq) | — |
+| **langchain-deepseek** | langchain-core, deepseek SDK | DeepSeek integration (ChatDeepSeek) | — |
+| **langchain-xai** | langchain-core, xAI SDK | xAI integration (ChatXAI) | — |
 
-Partners only depend on langchain-core (the abstractions), not langchain (the orchestration), enabling independent release cycles.
+Partners only depend on langchain-core (the abstractions), not langchain (the orchestration), enabling independent release cycles. Additional integrations are maintained by the LangChain team (e.g., langchain-mistralai, langchain-huggingface, langchain-together) and third-party providers (Google, AWS, Cohere, etc.).

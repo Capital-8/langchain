@@ -1,8 +1,11 @@
 ---
 type: "Reference"
-title: "Integration Testing: System-Level Validation"
+title: "Integration Testing: Live API and VCR Cassettes"
 description: "Integration testing patterns for multi-component workflows, API interactions, and provider integrations. Covers VCR recording, live API testing, model capability matrices, and standard conformance."
 tags: ["integration-testing", "vcr", "api-testing", "standard-tests", "mocking", "provider-testing"]
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-11-15T08:15:26.682Z
 sources:
   - id: openwiki-source-d8a8900818f4abab719bd1b7
     resource: repo://.github/workflows/_test_vcr.yml
@@ -32,10 +35,7 @@ sources:
     resource: repo://libs/standard-tests/langchain_tests/conftest.py
   - id: openwiki-source-025cad4ae99967890152b7e0
     resource: repo://libs/standard-tests/README.md
-generated: { by: "openwiki/0.5.0", at: "2026-11-13T08:16:35.902Z" }
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-13T08:16:35.902Z
+generated: { by: "openwiki/0.5.0", at: "2026-11-15T08:15:26.682Z" }
 ---
 
 ## Overview
@@ -198,9 +198,10 @@ env:
 Integration tests emit traces to LangSmith's `scheduled-testing-py` project (configurable) with GitHub context metadata:
 
 ```yaml
-LANGSMITH_TRACING: "true"
-LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
-LANGSMITH_TAGS: "github-actions,libs/partners/openai,python-3.11,sha-abc123"
+env:
+  LANGSMITH_TRACING: "true"
+  LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+  LANGSMITH_TAGS: "github-actions,libs/partners/openai,python-3.11,sha-abc123"
 ```
 
 Traces link back to the originating Actions run, enabling developers to debug failures by examining LLM calls and chain execution.

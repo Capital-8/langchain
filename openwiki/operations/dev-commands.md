@@ -3,6 +3,9 @@ type: "Developer Tools & Commands"
 title: "Development Commands and Local Setup"
 description: "Quick reference for uv, make, lint, test, and type-checking commands in the LangChain monorepo, including environment setup, pre-commit hooks, and testing workflows."
 tags: [development, build, testing, linting, typing, uv, make, pre-commit, local-setup]
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-11-15T08:15:26.682Z
 sources:
   - id: openwiki-source-4d1645cb6317345817452838
     resource: repo://.pre-commit-config.yaml
@@ -18,10 +21,7 @@ sources:
     resource: repo://libs/Makefile
   - id: openwiki-source-a6e669bb11f217c6fbd06670
     resource: repo://libs/partners/anthropic/Makefile
-generated: { by: "openwiki/0.5.0", at: "2026-11-06T08:17:28.425Z" }
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-11-13T08:16:35.902Z
+generated: { by: "openwiki/0.5.0", at: "2026-11-15T08:15:26.682Z" }
 ---
 
 ## Overview
@@ -200,557 +200,285 @@ make lint_diff
 make format_diff
 ```
 
-These targets apply `git diff` against `master` branch and only check changed files.
+These targets run the linters and formatters only on files that differ from `master` in the current package directory. Useful for incremental changes.
 
-### Ruff Configuration
-
-Ruff is configured per-package in `pyproject.toml` under `[tool.ruff]`:
-
-```toml
-[tool.ruff]
-select = ["ALL"]  # Check all rules
-ignore = [...]    # Package-specific ignores (e.g., D101 for docstrings)
-line-length = 88  # Black-compatible line length
-```
-
-Common rule categories:
-- **E/W**: PEP 8 errors and warnings
-- **F**: Pyflakes (undefined names, unused imports)
-- **I**: isort (import sorting)
-- **D**: Docstrings (pydocstyle)
-- **UP**: pyupgrade (modernize Python syntax)
-
-To see which rules are ignored:
+### Lint Specific Paths
 
 ```bash
-grep -A 20 "\[tool.ruff\]" pyproject.toml
+# Lint only package source code (not tests)
+make lint_package
+
+# Lint only test code
+make lint_tests
 ```
 
-### Type Checking
+## Type Checking
 
-Full type checking with mypy:
+### Run mypy
 
 ```bash
 make type
 ```
 
-Type checking verifies correct argument types, required type hints, and type consistency across code. Mypy runs in **strict mode** and can be slow for large packages. Configuration is defined in `pyproject.toml` under `[tool.mypy]` with settings like `strict = true`.
+This runs mypy with strict mode enabled. Mypy is configured in each package's `pyproject.toml` with:
+- Strict mode (`strict = true`)
+- Pydantic plugin enabled
+- Unreachable code warnings enabled
 
-To type-check specific paths:
+### Type Checking with Lint
 
-```bash
-# Single file
-uv run --group typing mypy libs/core/langchain_core/runnables.py
+Type checking is included as the fourth step in `make lint`, so running the full lint suite checks types automatically.
 
-# Only tests (faster, uses separate cache)
-cd libs/langchain && make lint_tests
-```
+## Testing
 
-Mypy caches results in `.mypy_cache` by default. Use `.mypy_cache_test` for test-only type checking to avoid cache conflicts.
+### Run Unit Tests
 
-## Testing Commands
-
-### Run All Unit Tests
+Unit tests in `tests/unit_tests/` run with network isolation:
 
 ```bash
-cd libs/core
+# From package directory
 make test
 ```
 
-Unit tests live in `tests/unit_tests/` with no network calls allowed. Tests run with:
-- `pytest` for test execution
-- `xdist` (-n auto) for parallelization across CPU cores
-- `--disable-socket --allow-unix-socket` to prevent accidental network calls
-- Snapshot updates via `--snapshot-update` (when using syrupy)
+This runs:
+- `pytest` with xdist parallelization (`-n auto`)
+- Network disabled (`--disable-socket --allow-unix-socket`) to prevent accidental external calls
+- Socket restrictions disabled for Unix sockets only (localhost communication works)
+- Benchmark disabled for speed
 
-**Special case: langchain_v1**
-
-The `langchain_v1` package requires Docker services (PostgreSQL and Redis) for certain tests:
+### Run Specific Test
 
 ```bash
-cd libs/langchain_v1
-make test  # Automatically starts/stops services
+# Using make variable
+make test TEST_FILE=tests/unit_tests/test_specific.py
+
+# Or direct pytest
+uv run --group test pytest tests/unit_tests/test_specific.py
 ```
 
-The `make test` target in `langchain_v1` uses `docker compose` to manage these services and sets `LANGGRAPH_TEST_FAST=0` to run the full test suite.
-
-### Run Specific Test File or Directory
+### Run Tests in Watch Mode
 
 ```bash
-# Using make with TEST_FILE parameter
-make test TEST_FILE=tests/unit_tests/agents/test_agent.py
-
-# Or use uv directly
-uv run --group test pytest tests/unit_tests/agents/test_agent.py -v
-
-# Specify test class or method
-uv run --group test pytest tests/unit_tests/agents/test_agent.py::TestAgent::test_invoke -v
-```
-
-The `TEST_FILE` parameter accepts:
-- Single file: `tests/unit_tests/agents/test_agent.py`
-- Directory: `tests/unit_tests/agents/`
-- Test identifier: `tests/unit_tests/agents/test_agent.py::TestClass::test_method`
-
-### Test in Watch Mode
-
-Auto-re-run tests as code changes:
-
-```bash
+# Auto-rerun on file changes
 make test_watch
 ```
 
-Uses `pytest-watcher` (via `ptw` command) and automatically updates snapshots. Ideal for test-driven development.
+Uses `pytest-watcher` to automatically rerun tests when source files change. Handy for TDD workflows.
 
 ### Extended Tests
 
-Some packages mark slower tests with `@pytest.mark.extended`:
+```bash
+# Run tests marked with @pytest.mark.requires_python_3_11_plus or similar
+make extended_tests
+```
+
+Tests marked as "extended" (e.g., slow or resource-intensive tests) are skipped by default but included with this target.
+
+### Integration Tests
+
+Integration tests in `tests/integration_tests/` require additional dependencies and allow network access:
 
 ```bash
-make extended_tests
+# Run integration tests
+make integration_tests
+```
+
+This runs:
+- `pytest` with both `test` and `test_integration` groups
+- Network enabled (no socket restrictions)
+- Allows testing against external APIs
+
+**Testing with multiple SDK versions** (example: anthropic package):
+
+```bash
+# Test against multiple anthropic versions
+uv run --with 'anthropic>=0.120.0,<1.0.0' --group test --group test_integration pytest tests/integration_tests/
+uv run --with 'anthropic>=1.0.0,<2.0.0' --group test --group test_integration pytest tests/integration_tests/
 ```
 
 ### Coverage Reports
 
-Generate code coverage reports:
-
 ```bash
+# Generate coverage report with text and XML output
 make coverage
 ```
 
-Produces both XML and term-missing reports showing which lines of code are not covered by tests. The configuration comes from `.coveragerc` in each package. Results are useful for identifying untested code paths and improving test coverage.
+Produces:
+- Terminal output showing covered/uncovered lines
+- XML report for CI tools
+- HTML report (in some configurations)
 
-**Note**: `langchain_v1` includes special coverage targets:
-- `make coverage_agents`: Focuses coverage on agent middleware code (`tests/unit_tests/agents/` and `langchain.agents` module)
+## Monorepo-Level Tasks
 
-### Integration Tests
-
-Integration tests live in `tests/integration_tests/` and require network access, API keys, and the `test_integration` dependency group:
-
-```bash
-make integration_tests
-```
-
-This command ensures both `test` and `test_integration` groups are installed, which include SDK clients and mock utilities.
-
-**Multi-version SDK testing** (partner packages):
-
-Some partner packages test compatibility with multiple major versions of their SDK. For example, `libs/partners/anthropic`:
+The root `libs/Makefile` provides commands that operate across multiple packages:
 
 ```bash
-cd libs/partners/anthropic
-# Test with anthropic 0.x (uses httpx)
-uv run --with 'anthropic>=0.120.0,<1.0.0' --group test --group test_integration pytest -v tests/integration_tests/test_chat_models.py::test_stream
-
-# Test with anthropic 1.x (uses httpx2)
-uv run --with 'anthropic>=1.0.0,<2.0.0' --group test --group test_integration pytest -v tests/integration_tests/test_chat_models.py::test_stream
-```
-
-The `--with` flag temporarily adds the specified version to the environment without modifying `uv.lock`.
-
-## Debugging Tests
-
-### Verbose Output
-
-```bash
-# With single verbosity (-v)
-uv run --group test pytest tests/unit_tests/agents/test_agent.py -v
-
-# With double verbosity (-vv) shows assertion details and progress
-uv run --group test pytest tests/unit_tests/ -vv
-
-# Use make with PYTEST_EXTRA parameter
-make test PYTEST_EXTRA="-vv"
-```
-
-### Drop Into Debugger
-
-Use pytest's built-in debugger integration:
-
-```bash
-# Stop at first failure and drop into pdb
-uv run --group test pytest tests/unit_tests/agents/test_agent.py --pdb
-
-# Trace execution (sets breakpoint in debugger immediately, runs slower)
-uv run --group test pytest tests/unit_tests/agents/test_agent.py --trace
-
-# Drop into pdb on failures with short traceback
-uv run --group test pytest tests/unit_tests/agents/test_agent.py --pdb --tb=short
-```
-
-**Interactive debugging in tests:**
-
-Add a breakpoint in your test code:
-
-```python
-def test_my_function():
-    result = my_function()
-    breakpoint()  # Debugger stops here when pytest runs
-    assert result == expected
-```
-
-Then run:
-
-```bash
-uv run --group test pytest tests/unit_tests/my_test.py -s  # -s prevents output capture
-```
-
-**Debugging with IDE:**
-
-Most IDEs (VS Code, PyCharm) can attach directly to `uv run` processes:
-
-1. Set breakpoints in your IDE
-2. Configure launch configuration to run `uv run --group test pytest <path>`
-3. Run with debugger attached
-
-### List Tests Without Running
-
-```bash
-# Collect and display all tests
-uv run --group test pytest tests/unit_tests/ --collect-only
-
-# Collect tests matching a pattern
-uv run --group test pytest --collect-only -q tests/unit_tests/ -k "agent"
-```
-
-### Run Tests Matching a Pattern
-
-```bash
-# Run all tests with "agent" in name
-uv run --group test pytest -k "test_agent" tests/unit_tests/
-
-# Exclude tests
-uv run --group test pytest -k "not slow" tests/unit_tests/
-
-# Use make with PYTEST_EXTRA
-make test PYTEST_EXTRA="-k test_agent -vv"
-```
-
-### Stop on First Failure
-
-```bash
-# Exit on first failure
-uv run --group test pytest tests/unit_tests/agents/ -x
-
-# Use in make
-make test PYTEST_EXTRA="-x"
-```
-
-## Per-Package Development Workflow
-
-To develop a single package in the monorepo:
-
-```bash
-# Example: work on langchain_v1
-cd libs/langchain_v1
-
-# 1. Install all dependencies
-uv sync --all-groups
-
-# 2. Run tests on changes
-make test_watch  # Terminal 1
-
-# 3. Edit code in Terminal 2
-# Changes auto-trigger re-run in Terminal 1
-
-# 4. Before committing
-make format
-make lint
-make test
-
-# 5. Commit (pre-commit hooks run automatically)
-git commit -m "feat(langchain_v1): description"
-```
-
-Each package follows the same Makefile structure with consistent targets.
-
-## Make Targets Reference
-
-All packages support these standard make targets:
-
-| Target | Purpose |
-|--------|---------|
-| `make test` | Run all unit tests (parallel with xdist) |
-| `make test TEST_FILE=<path>` | Run tests in specific file/directory |
-| `make test_watch` | Run tests in watch mode (auto-rerun) |
-| `make extended_tests` | Run only `@pytest.mark.extended` tests |
-| `make integration_tests` | Run integration tests (requires API keys) |
-| `make coverage` | Run tests and generate coverage report |
-| `make lint` | Run ruff check + ruff format --diff + mypy |
-| `make lint_diff` | Lint only changed files (git diff vs master) |
-| `make lint_package` | Lint package code only (skip tests) |
-| `make lint_tests` | Lint test code only (faster) |
-| `make format` | Apply ruff format + ruff check --fix |
-| `make format_diff` | Format only changed files |
-| `make type` | Run mypy type checking |
-| `make check_version` | Validate version consistency (package-specific) |
-| `make help` | Display available targets |
-
-Package-specific targets vary; run `make help` in a package directory to see all available options.
-
-## Environment Variables
-
-The Makefiles use environment variables to control behavior. These are set via `.EXPORT_ALL_VARIABLES` in each Makefile:
-
-| Variable | Purpose | Default |
-|----------|---------|---------|
-| `UV_FROZEN` | Prevent lock file changes during `uv sync` | `true` (set in all Makefiles) |
-| `TEST_FILE` | Path to test file or directory | `tests/unit_tests/` |
-| `PYTEST_EXTRA` | Extra pytest options (e.g., `-vv`, `-x`, `-k "pattern"`) | (empty) |
-| `PYTHON_FILES` | Files to lint/format (used by `make lint_diff`, `make format_diff`) | `.` (all files) |
-| `MYPY_CACHE` | Mypy cache directory for type checking | `.mypy_cache` |
-| `LANGCHAIN_TRACING_V2` | LangSmith tracing flag (unset during tests) | (unset) |
-| `LANGGRAPH_TEST_FAST` | Use in-memory services (langchain_v1 only) | `0` (use real Docker services) |
-
-**Example: Run fast tests with verbosity:**
-
-```bash
-make test PYTEST_EXTRA="-vv" TEST_FILE=tests/unit_tests/agents
-```
-
-**Example: Run lint_tests with custom cache:**
-
-```bash
-make lint_tests MYPY_CACHE=.mypy_cache_test
-```
-
-**Example: Run only extended tests (langchain_v1):**
-
-```bash
-cd libs/langchain_v1
-make extended_tests
-```
-
-## Lock File Management
-
-The `uv.lock` file in each package pins exact dependency versions for reproducible builds and consistency across developers. All Makefiles set `UV_FROZEN=true` via `.EXPORT_ALL_VARIABLES` to prevent unintended lock changes during regular `uv sync` operations.
-
-### Updating Locks
-
-When you modify `pyproject.toml` (adding/removing/updating dependencies or groups), regenerate the lock file:
-
-```bash
-# From a package directory
-uv lock
-
-# Regenerate all core package locks
+# Update lock files for all core packages
 cd libs && make lock
 
-# Verify all locks are up-to-date (CI check)
+# Verify all lock files are up-to-date
 cd libs && make check-lock
 ```
 
-The `check-lock` target verifies locks match the current `pyproject.toml` without modifying them—useful for CI/CD to ensure lock files aren't stale.
+These iterate over `core`, `text-splitters`, `langchain`, and `langchain_v1`, ensuring consistent lock states across the monorepo.
 
-**Important**: Do not commit changes to `uv.lock` from `uv sync` with `UV_FROZEN=false`. Instead, intentionally run `uv lock` to regenerate locks when dependencies change, then commit the result.
+## Common Development Workflows
 
-## Common Workflows
-
-### Before Committing
+### Local Development Loop
 
 ```bash
-# 1. Format code
-make format
+# 1. Navigate to your package
+cd libs/core
 
-# 2. Run linting and type checks
-make lint
+# 2. Install dependencies once
+uv sync --all-groups
 
-# 3. Run tests
-make test
+# 3. Make changes to code
 
-# 4. Commit (pre-commit hooks run automatically)
-git commit -m "feat(core): description"
-```
-
-Alternatively, let pre-commit hooks handle formatting/linting:
-
-```bash
-make test
-git add .
-git commit  # or pre-commit run --all-files first
-```
-
-### Iterative Development
-
-For fast feedback during development:
-
-```bash
-# Terminal 1: Watch tests
+# 4. Run tests in watch mode (auto-rerun on save)
 make test_watch
 
-# Terminal 2: Edit code and format on save
+# 5. When ready to commit, format and lint
 make format
-```
-
-Tests in Terminal 1 auto-rerun when files change.
-
-### Fixing Lint Errors
-
-When `make lint` fails:
-
-```bash
-# 1. Auto-fix formatting and simple lint issues
-make format
-
-# 2. Re-check
 make lint
 
-# 3. Fix remaining issues manually (e.g., mypy type errors)
-# Edit source files, then:
-make type
+# 6. Run full test suite before push
+make test
 ```
 
-For faster iteration on specific files:
+### Pre-commit Enforcement
+
+Before pushing, pre-commit hooks run automatically:
 
 ```bash
-# Format and lint single file
-uv run --group lint ruff check --fix langchain/agents/agent.py
-uv run --group lint ruff format langchain/agents/agent.py
-uv run --group typing mypy langchain/agents/agent.py
+# Simulate what git will check
+pre-commit run --all-files
+
+# If pre-commit fails, fix issues:
+make format  # Fix formatting
+make lint    # Check for remaining issues
+git add .
+git commit -m "Fix lint/format issues"
+```
+
+### Integration Testing with Multiple Versions
+
+For partner packages that support multiple SDK versions:
+
+```bash
+cd libs/partners/anthropic
+
+# Test smoke tests against multiple anthropic versions
+uv run --with 'anthropic>=0.120.0,<1.0.0' --group test --group test_integration pytest tests/integration_tests/test_chat_models.py::test_stream
+
+uv run --with 'anthropic>=1.0.0,<2.0.0' --group test --group test_integration pytest tests/integration_tests/test_chat_models.py::test_stream
+```
+
+### Faster Iteration with lint_diff and format_diff
+
+When working on a feature branch:
+
+```bash
+# Format only changed files (vs master)
+make format_diff
+
+# Lint only changed files
+make lint_diff
+
+# This is much faster than linting the entire package
+```
+
+### Debugging Test Failures
+
+```bash
+# Run with verbose output
+uv run --group test pytest tests/unit_tests/test_foo.py -vv
+
+# Run a single test function
+uv run --group test pytest tests/unit_tests/test_foo.py::test_something -vv
+
+# Disable socket isolation temporarily for debugging (allows network)
+uv run --group test pytest tests/unit_tests/test_foo.py --disable-socket=false -vv
+
+# Run with pdb debugger on failure
+uv run --group test pytest tests/unit_tests/test_foo.py --pdb
+```
+
+## Environment Variables and Configuration
+
+### Test Environment Cleanup
+
+The `test` target unsets several environment variables to prevent accidental external service calls:
+
+```bash
+env \
+  -u LANGCHAIN_TRACING_V2 \
+  -u LANGCHAIN_API_KEY \
+  -u LANGSMITH_API_KEY \
+  -u LANGSMITH_TRACING \
+  -u LANGCHAIN_PROJECT \
+  uv run --group test pytest ...
+```
+
+This ensures unit tests run in isolation without connecting to LangSmith or other external services.
+
+### Lock File Behavior
+
+`UV_FROZEN=true` is set via `.EXPORT_ALL_VARIABLES` in all Makefiles:
+
+```makefile
+.EXPORT_ALL_VARIABLES:
+UV_FROZEN = true
+```
+
+This prevents `uv sync` from modifying lock files during CI or development. To update dependencies:
+
+```bash
+# Explicitly unlock and update
+cd libs/core
+uv lock  # Updates uv.lock
+
+# Or from monorepo root
+cd libs && make lock
 ```
 
 ## Troubleshooting
 
-### Lock file out of sync
+### "ModuleNotFoundError" or missing dependencies
 
 ```bash
-# Regenerate lock for current package
-uv lock
-
-# Or check if lock is up-to-date
-uv lock --check
-
-# If conflicts, reset and regenerate
-rm uv.lock
-uv lock
+# Ensure you've synced dependencies for your package
+cd libs/core
+uv sync --all-groups
 ```
 
-### Dependencies not installed
+### Pre-commit hook skips your changes
+
+Make sure your files match the hook patterns. For example, `core` hook only runs on `^libs/core/` paths. If you're in `libs/langchain`, the core hook won't trigger.
+
+### Type checking errors after code changes
+
+Clear the mypy cache:
 
 ```bash
-# Ensure all groups are installed
-uv sync --all-groups
+rm -rf .mypy_cache
+make type
+```
 
-# Or just the test group
+### Lock file is stale
+
+```bash
+cd libs && make check-lock
+# If it fails, update:
+cd libs && make lock
+```
+
+### Too many test dependencies
+
+If you only need to run tests without linting:
+
+```bash
 uv sync --group test
-
-# Reinstall from scratch
-rm uv.lock
-uv sync --all-groups
 ```
 
-### Tests fail with "no network" error
-
-This is intentional—unit tests have socket restrictions to prevent accidental network calls. For integration tests:
-
-```bash
-make integration_tests
-```
-
-To bypass socket restrictions temporarily (for debugging):
-
-```bash
-uv run --group test pytest --disable-socket=false tests/unit_tests/
-```
-
-### Ruff or mypy not found
-
-```bash
-# Install lint and typing groups
-uv sync --group lint --group typing
-
-# Or just all groups
-uv sync --all-groups
-
-# Verify ruff and mypy are available
-uv run --group lint ruff --version
-uv run --group typing mypy --version
-```
-
-### Pre-commit hook fails locally but passes in CI
-
-This usually indicates a Python version mismatch or missing dependency groups:
-
-```bash
-# Check Python version matches CI
-python --version  # Should match pyproject.toml requires-python
-
-# Ensure all groups are installed
-uv sync --all-groups
-
-# Run pre-commit hooks manually to debug
-pre-commit run --all-files
-
-# If still failing, try with verbose output
-pre-commit run --all-files --verbose
-```
-
-If a specific hook fails, you can run it in isolation:
-
-```bash
-# Run just the core package hooks
-pre-commit run core --all-files
-
-# Run version check hooks
-pre-commit run core-version --all-files
-```
-
-### Cache clearing
-
-If you encounter stale cache issues:
-
-```bash
-# Clear mypy cache
-rm -rf .mypy_cache .mypy_cache_test
-
-# Clear pytest cache
-rm -rf .pytest_cache
-
-# Clear ruff cache
-rm -rf .ruff_cache
-
-# Full clean: reinstall environment
-rm uv.lock
-uv sync --all-groups
-```
-
-### Dependency conflicts
-
-When dependency resolution fails:
-
-```bash
-# From package directory
-rm uv.lock
-uv lock
-
-# Or check for specific conflicts
-uv sync --all-groups
-```
-
-### Python version mismatch
-
-If you get errors about unsupported Python versions:
-
-```bash
-# Check your current Python version
-python --version
-
-# Check the package's required version
-grep "requires-python" pyproject.toml
-
-# Switch to correct version (if using pyenv)
-pyenv local 3.12  # or your required version
-
-# Reinstall with correct version
-rm -rf .venv uv.lock
-uv sync --all-groups
-```
-
-Each package specifies `requires-python` in its `pyproject.toml`. The full LangChain monorepo supports Python 3.10–3.14.
-
-## Related Documentation
-
-- [Quickstart](/openwiki/quickstart.md): Getting started with LangChain development
-- [CI Workflows](/openwiki/operations/ci-workflows.md): GitHub Actions, release processes, and automation
-- [Unit Tests](/openwiki/testing/unit-tests.md): Unit test structure, fixtures, and best practices
-- [Integration Tests](/openwiki/testing/integration-tests.md): Integration test setup, Docker services, and API mocking
+This is faster for quick iteration; later sync `--all-groups` before committing.

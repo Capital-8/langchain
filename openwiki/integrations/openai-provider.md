@@ -1,30 +1,35 @@
 ---
 type: "Reference"
-title: "OpenAI Provider: ChatOpenAI Implementation"
-description: "Deep dive into the ChatOpenAI implementation: API client setup, message translation, tool handling, structured output, streaming, and Azure support."
-tags: ["chat-model", "openai", "tool-calling", "structured-output", "vision", "streaming", "partner-pattern", "azure"]
+title: "OpenAI Provider: ChatOpenAI Implementation and Decisions API"
+description: "Deep dive into the ChatOpenAI and AzureChatOpenAI implementations, the OpenAI Decisions API, and specialized middleware including API key management, message translation, tool handling, structured output, streaming, vision support, and request routing."
+tags: ["chat-model", "openai", "tool-calling", "structured-output", "vision", "streaming", "partner-pattern", "azure", "decisions-api", "middleware"]
 sources:
   - id: openwiki-source-738512768ef81ae009b097ac
     resource: repo://libs/partners/openai/langchain_openai/chat_models/base.py
   - id: openwiki-source-b65307f1d05bd74532af2eee
     resource: repo://libs/partners/openai/langchain_openai/decisions/base.py
-generated: { by: "openwiki/0.5.0", at: "2026-11-05T08:18:41.280Z" }
+  - id: openwiki-source-e348c8131205eb31637236df
+    resource: repo://libs/partners/openai/langchain_openai/middleware/model_router.py
+  - id: openwiki-source-a2c018cbcc6b104864424003
+    resource: repo://libs/partners/openai/langchain_openai/middleware/openai_moderation.py
+generated: { by: "openwiki/0.5.0", at: "2026-11-15T08:15:26.682Z" }
 verified:
   - by: openwiki/0.5.0
-    at: 2026-11-13T08:16:35.902Z
+    at: 2026-11-15T08:15:26.682Z
 ---
 
 # OpenAI Provider Implementation
 
-The OpenAI integration (`langchain-openai`) provides production-ready implementations of LangChain chat models, embeddings, and decision systems that target the official [OpenAI API specifications](https://github.com/openai/openai-openapi). The integration demonstrates the partner pattern for adapting a complex, multi-API provider into LangChain's unified abstractions.
+The OpenAI integration (`langchain-openai`) provides production-ready implementations of LangChain chat models, embeddings, decision systems, and middleware that target the official [OpenAI API specifications](https://github.com/openai/openai-openapi). The integration demonstrates the partner pattern for adapting a complex, multi-API provider into LangChain's unified abstractions.
 
 ## Overview: Provider Architecture
 
-The OpenAI package contains three main components:
+The OpenAI package contains four main components:
 
 1. **Chat Models** (`ChatOpenAI`, `BaseChatOpenAI`): The primary LLM interface implementing `BaseChatModel`.
-2. **Decisions API** (`OpenAIDecisions`): A specialized runnable for typed question-answering.
-3. **Embeddings** (`OpenAIEmbeddings`, `AzureOpenAIEmbeddings`): Text embedding implementations (not covered here).
+2. **Azure Variant** (`AzureChatOpenAI`): Azure-specific deployment and authentication handling.
+3. **Decisions API** (`OpenAIDecisions`): A specialized runnable for typed question-answering and multi-choice routing.
+4. **Middleware** (`OpenAIModelRouterMiddleware`, `OpenAIModerationMiddleware`): Agent middleware for model selection and content moderation.
 
 The chat model hierarchy is:
 - `BaseChatOpenAI`: Abstract base supporting both Chat Completions and Responses APIs
@@ -151,7 +156,7 @@ The OpenAI integration resolves API keys through a multi-step process:
 1. **Explicit `api_key` parameter** (highest priority): Can be a string, sync callable, or async callable returning a string.
 2. **Environment variable `OPENAI_API_KEY`** (read at init time by LangChain).
 3. **LangSmith Gateway** (if `LANGSMITH_GATEWAY` is set): Uses `LANGSMITH_API_KEY` or `LANGSMITH_GATEWAY_API_KEY`.
-4. **Environment variable `OPENAI_API_BASE`** (read by the underlying SDK at runtime).
+4. **Environment variable `OPENAI_BASE_URL`** (read by the underlying SDK at runtime if base_url not set).
 
 ```python
 from langchain_openai import ChatOpenAI
@@ -741,7 +746,7 @@ for chunk in structured_model.stream("Tell me a joke"):
     print(chunk)
 ```
 
-## Decision Patterns and Model-Specific Features
+## Decisions API and Routing Patterns
 
 The `/decisions/` submodule provides `OpenAIDecisions`, a specialized runnable for OpenAI's Decisions API. This API answers typed questions about text or images, returning probabilities, confidence scores, and token usage.
 
@@ -779,11 +784,80 @@ print(response.answers["urgent"].probability)  # 0.92
 print(response.answers["frustration"].score)  # 2 (Angry)
 ```
 
+**Response structure:**
+- `answers` dict keyed by question name
+- Each answer includes `probability` (Predicate), `probabilities` (Choice), or `score` (Score)
+- `model_name` indicating which model was used
+- `usage` containing token counts
+- `request_id` for tracing
+
+**Question types:**
+- **Predicate**: Boolean probability (0.0 to 1.0) for yes/no questions
+- **Choice**: Multi-option selection with individual probabilities for each option
+- **Score**: Numeric rating (0 to N-1 for N levels) with confidence
+
 Configuration mirrors `ChatOpenAI`:
 - `api_key`: Auto-loaded from `OPENAI_API_KEY` or provided explicitly
 - `base_url`: Optional proxy or custom endpoint
 - `organization`: OpenAI org ID
 - `timeout`, `max_retries`: Client behavior tuning
+
+### OpenAI Middleware: Model Routing
+
+The `OpenAIModelRouterMiddleware` uses the Decisions API to route agent requests to different models:
+
+```python
+from langchain_openai.middleware import OpenAIModelRouterMiddleware, ModelChoice
+
+router = OpenAIModelRouterMiddleware(
+    model="gpt-6-luna",  # Decisions model
+    models=[
+        ModelChoice(
+            model="gpt-4o",
+            criteria="Complex reasoning and long-form analysis"
+        ),
+        ModelChoice(
+            model="gpt-4.1-mini",
+            criteria="Simple queries and fast responses"
+        ),
+    ]
+)
+
+# Classifies each human message, stores route in agent state
+```
+
+**Routing behavior:**
+- Classifies the latest human message once per agent run
+- Stores route as `ModelRoute` in agent state with choice, probabilities, and confidence
+- Replaces hosted image URLs with placeholders; base64 images are sent
+- Retries once if request is rejected (HTTP 400 or 413) with images replaced
+
+### OpenAI Middleware: Content Moderation
+
+The `OpenAIModerationMiddleware` uses OpenAI's moderation endpoint to flag unsafe content:
+
+```python
+from langchain_openai.middleware import OpenAIModerationMiddleware
+
+moderator = OpenAIModerationMiddleware(
+    model="omni-moderation-latest",
+    check_input=True,
+    check_output=True,
+    check_tool_results=False,
+    exit_behavior="end",  # or "error" or "replace"
+    violation_message="Content was flagged. Please rephrase."
+)
+```
+
+**Configuration:**
+- `model`: Moderation model (default: `omni-moderation-latest`)
+- `check_input`: Check user messages (default: True)
+- `check_output`: Check model output (default: True)
+- `check_tool_results`: Check tool results (default: False)
+- `exit_behavior`: How to handle violations:
+  - `"end"`: Stop agent run
+  - `"error"`: Raise `OpenAIModerationError`
+  - `"replace"`: Replace message with violation template
 
 ## Disabled Parameters
 

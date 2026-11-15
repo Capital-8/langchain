@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:0e1b2a3141b9ecb7ceec4c8c729ce904f1f22627da6666e21d98c745267aed6d",
+  "pageVersion": "sha256:0f6db21a0fd7f852b3b7c0bcfe86b30080c7e3b2bb2b12967dbefec1bd7109f4",
   "claims": [
     {
       "id": "claim_c5bc4bfccc6949a6b4fdab357d92d652",
@@ -131,10 +131,68 @@
           "version": "repo-lines-v1:sha256:8cf2cfc40dbd85ab26c8b1c5a4f7e9c1df9a652aada50d89fb0c770dc881ebaa:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3MjdmYTY2Njk3OWNkM2M2Yzc2MjZmZjJhZGRiN2Q0MTM4NzMwMzk4ZmIxMDVmNzY1YTUwN2UxODE5MzgyOTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1YmM0NzExZWNjYTA0NTBhZmM4MzI3NzlhODg2NzZhN2M2OTYwZmEzZGE1YWY0MTBlZTAyZDFlMDE1MTU5MWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjYzRhN2QxY2M3OTZhYmEzZTQ2NzIzMzI3ZjUxN2U5ZjgxMTk4MmQyNTBmMDcwMjk4NmU0YjU3NjRhZDk1ODkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE2NDEzZjBiNDZhYWYyNTBjNGQ0NzIxYmJmZDg5Yjc2NmMxMGRkYmY1ODJhNjM1OTU1OWRlMjdhODY1ZjdkYTkifQ"
         }
       ]
+    },
+    {
+      "id": "claim_ad1904edc67c4051b892fa0a6f216991",
+      "statement": "The @tool decorator provides multiple usage patterns for creating tools from functions and Runnables: decorator without arguments (@tool), with custom name (@tool(\"name\")), with configuration parameters (@tool(...parameters...)), and wrapping Runnables (tool(\"name\", runnable)), automatically selecting between Tool and StructuredTool based on infer_schema configuration and handling schema inference from type hints and docstrings.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/tools/convert.py#L77-L410",
+          "version": "repo-lines-v1:sha256:1597ab6a8fd6aecf8b8fb03a2b1056c314ae0e5010a2340e1d85686b466c4527:eyJzZWxlY3RlZExpbmVDb3VudCI6MzM0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI4ODk0OWJmOGVmNDJkNDNkYzA0NTVlODY0MTYxMTk3MDJjMzQ4ZTRmNzhhNTgzMzZlYWMwMGMzZGU0MzJkMWU4IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwODE5Zjc5NGZjMWFjMTg3MzIyNmUwMDFmZDhkOWRiZTMxNDBlOWRkMzkxMWYyMzQ5MDIwY2YzMDY0NTBmNWNkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5OWFjZDVlMjA3NGJlNjU5OTBjN2YzNWVhZTdiMDU5OTAyYTUyNDZjM2NjNTBjMDNkNTMxYTMzN2Q1YzJiMTY3IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIyYjJiMzFjYzJiNjk3OTI3YmE0OWFhODc1YTYwMGFhZjAxNmNlNjJmZjBmNjY3MDJkZTU0YmI1NzExYzc2ODRjIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_2510dcd5725047aa9d31804583d4dc73",
+      "statement": "The @tool decorator accepts configuration parameters: description (with precedence: explicit > docstring > args_schema), return_direct (terminate agent loop), args_schema (explicit input schema), infer_schema (auto-generate schema from signature, default True), response_format (\"content\" or \"content_and_artifact\"), parse_docstring (extract descriptions from Google-style docstrings), error_on_invalid_docstring (raise on invalid docstring when parsing), and extras (provider-specific configuration like Anthropic cache_control).",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/tools/convert.py#L77-L160",
+          "version": "repo-lines-v1:sha256:09dddb9b17b868996a4228e59b3dc28e64bda279cd195868f8ef7d81348cf9c3:eyJzZWxlY3RlZExpbmVDb3VudCI6ODQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4OTQ5YmY4ZWY0MmQ0M2RjMDQ1NWU4NjQxNjExOTcwMmMzNDhlNGY3OGE1ODMzNmVhYzAwYzNkZTQzMmQxZTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA0YWQ4YWZlNDc0MThjZWM1MzZkMWNkMzJkZDdmMTkwODQzY2Q1YmUyZmNhYTU4NjUyYmEyM2RjNzg4MGVjZjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5YWNkNWUyMDc0YmU2NTk5MGM3ZjM1ZWFlN2IwNTk5MDJhNTI0NmMzY2M1MGMwM2Q1MzFhMzM3ZDVjMmIxNjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUwYmNlN2MzYTViZDM4MzY0NDBhZWFmOTRhNTU5NGY0Y2M4NWIxNmIwZjU3YjI4MGU3ZWZkMjBiZTMyMjc5MDcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b078cac622354e6588c31a8ed9246b5d",
+      "statement": "create_schema_from_function() generates a Pydantic model from function signatures by: extracting type hints including Annotated types, parsing Google-style docstrings if requested, merging descriptions from Annotated metadata and docstrings, filtering reserved parameters (run_manager, callbacks) and injected arguments, excluding synthetic Pydantic fields (args, kwargs) unless capturing *args/**kwargs, and excluding class/instance method self/cls parameters; supporting both Pydantic v1 and v2 annotations with error on mixed versions.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/tools/base.py#L264-L370",
+          "version": "repo-lines-v1:sha256:e15509cce8b2176c0faabcf43a600108637366d128d5c2a9a65008c7b9a79d29:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJkNzFjZmJkMTEyZDAwODM3MDA5MjczMmMwYWI0YWFjODMyNzE5NzAzZmI3NWU0MzM3YTIwYThiODkyOWY0NGY5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmMWY4NzEyZTdmNzg3OTdiMzI5NGQ3OTE3Mzc5NTU1ODcxMWZhNzcwZTI1ODAyNTgxNDBmNDQ3Nzk5MDdmMjNjIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJhNDU0NWE2MTdhNDQ5ODU1ZTc1MjM4ZGFiMmIzYWFjNTNmYjM3YjNmZjg1NzNiYTkxMGE3MmYzNWY4YmY5NzQ3In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_ff67a78cfef34fd7aa97854dacd32f8e",
+      "statement": "Injected arguments are identified through _get_injected_args_keys_from_signature() which resolves postponed annotations (from __future__ import annotations, quoted forward references) using get_type_hints with per-parameter fallback retry so unresolvable forward references don't disable injection for resolvable parameters, and checks annotations against _is_injected_arg_type() which detects both Annotated[T, InjectedToolArg] patterns and directly injected types like ToolRuntime.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/tools/base.py#L1618-L1677",
+          "version": "repo-lines-v1:sha256:336743765c140d356bf589a28d6e4d2c6490cf37cc4356feee4cd0f14a035184:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyMTY5NWVjZjVjN2UzY2NjYjcwOTExMzA4ZmUzMjlmNzAyMjBmMDVlMGUxZTA1Zjk4OWU2OGQ0MmY4MWM0ODgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3YmU0ZDkzMzE5OWZhZTM3OGFjYjg4ZDg5ZjE4YjVhNTVjMTEwNDk4MzA3ZjBiMzZiNDg4NjNjYTljMDg5MjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliOGNiZjRkNWU4MGJiZTVlNDhjNTdmNGZjYjczNTY3M2Q2MDc3NDBiNDJhN2FiNmM5MjM2ZTM3MmE5ZjUzZTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM1MDVjMmYyNGQzOTM0ZDc3Y2VhNTQxZWQwNTgxZWVjNmZhODA1MzBlMTg2YjBiZGUxODM5NTc2M2FmYzc3YTAifQ"
+        },
+        {
+          "resource": "repo://libs/core/langchain_core/tools/base.py#L1803-L1829",
+          "version": "repo-lines-v1:sha256:7dd15aa103391b9e870d5b4a92ec6deca2ba805264f5fd47d6144065a577014e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxMjExOGViYzk2OTg0ZWRjNzExY2MzNzk3M2Y2MDE1NmUyMmNlN2E2MmUwYjU1ZDUwYmUzMjA2OWQ0MjlkZWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjYzRhN2QxY2M3OTZhYmEzZTQ2NzIzMzI3ZjUxN2U5ZjgxMTk4MmQyNTBmMDcwMjk4NmU0YjU3NjRhZDk1ODkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjllZjIxYzViNzRhMTA5NjQ2ZWU4NzA4ZDFhOTdmNTUzMjJiMDI4Zjk5Nzg5ZGI3N2U0OTlkY2FmNWJkMzFmYTIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_85d71dbd4a734e3fbfe90ce78e485224",
+      "statement": "Tool is a single-input tool that enforces exactly one argument, defaulting to {\"tool_input\": {\"type\": \"string\"}} schema when args_schema is None, used for simple function wrappers and backward compatibility; StructuredTool supports multiple arguments with explicit schema-driven parsing where each function parameter becomes a schema field (except injected args), supporting both sync (func) and async (coroutine) invocation, and is preferred for agent tools with multiple named parameters.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/tools/simple.py#L31-L97",
+          "version": "repo-lines-v1:sha256:27e4cb61c627ba1ba191de72da1fbc5373bcacd42c10a1c54d5404badb46d424:eyJzZWxlY3RlZExpbmVDb3VudCI6NjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUxNDRiNjkyNjE2MDM2NmQzYWVmZTE3ZWJiMDgzZGEwMzk0OWJkYzUxMzQ5NmZmMGFmMjdlNTMxMDg3NmQwZDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzZTdmOWI5ODlkZjNjM2VmMGFiMWEzODQ3MTY1NzI1ZTJhYmZjM2I3Y2JmYTViMzA1NTc1OWIyNTk5NDgwOTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiYWZlOWEwOTczZDA3YjRhMjM0ZjVlNjg5MWVmYzZmMzRlNjM4N2ExMWUwMTAzZmZjMWZlZmMxM2FjMWQzM2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFkOTc3OTM5ZGEwOTM4NTVmZmU1YzdmNWQ5ZWM3OGQ0MTY1ZTQ3NmY2OGZiZjU1NWFlNzc2OWVmZWMzNGQ4NTQifQ"
+        },
+        {
+          "resource": "repo://libs/core/langchain_core/tools/structured.py#L93-L126",
+          "version": "repo-lines-v1:sha256:d60a32166d3db251f2352e79271cb76d8d9b93d4fa1f53c93acd2d116d62406a:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwNGEyZmU0N2EzYTE0MzZkZGMwMWQ0ZTE3YWU4ZjhhZjBjYjNjYTY2ZTQ1NmU4N2VkODQ1ZjU4YjYwYTA2ZjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU0YzE2NjhlYzljZjAyZjcxYjY5YjUyMzg5YTUzYjNiZjU2ZDNiOWJlYmUxNWNlM2UxMGJiZDczNWY1ZWFjNjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFjMzU1YWI0OTRmYmJjOGJlMjU1NDkxODU2NWQyOTU2ZDYyNjJiODUwNTlkMjUwZGFkYjQ3NjAwYWU0MmMxNDgifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-13T08:16:35.902Z"
+    "at": "2026-11-15T08:15:26.682Z"
   }
 }

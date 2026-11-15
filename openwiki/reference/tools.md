@@ -1,15 +1,21 @@
 ---
 type: "API Reference"
-title: "BaseTool API and Schema Generation"
-description: "Reference documentation for BaseTool class, schema generation, input validation, and execution lifecycle in LangChain's tool system."
-tags: ["tools", "api", "schema", "validation", "BaseTool"]
+title: "Tool Interface and Conversion"
+description: "Reference documentation for BaseTool class, @tool decorator, schema generation, input validation, and execution lifecycle in LangChain's tool system."
+tags: ["tools", "api", "schema", "validation", "BaseTool", "decorator"]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-11-13T08:16:35.902Z
+    at: 2026-11-15T08:15:26.682Z
 sources:
   - id: openwiki-source-4ff475d7b00540f962384251
     resource: repo://libs/core/langchain_core/tools/base.py
-generated: { by: "openwiki/0.5.0", at: "2026-11-13T08:16:35.902Z" }
+  - id: openwiki-source-9c422fcb5ac12738f17d1cd1
+    resource: repo://libs/core/langchain_core/tools/convert.py
+  - id: openwiki-source-80e84f93417c922f44011393
+    resource: repo://libs/core/langchain_core/tools/simple.py
+  - id: openwiki-source-b816e651a5890bde13cf8013
+    resource: repo://libs/core/langchain_core/tools/structured.py
+generated: { by: "openwiki/0.5.0", at: "2026-11-15T08:15:26.682Z" }
 ---
 
 ## BaseTool Class
@@ -309,6 +315,137 @@ Raised by tools to signal errors without stopping the agent. Handled according t
 ### `SchemaAnnotationError`
 Raised during class definition if `args_schema` has incorrect type annotation (e.g., bare `BaseModel` instead of `Type[BaseModel]`).
 
+## The @tool Decorator
+
+The `@tool` decorator is the primary interface for creating tools from Python functions and Runnables. It provides flexible schema inference, parameter description extraction, and automatic conversion to either `Tool` or `StructuredTool` depending on the configuration.
+
+**Location:** `repo://libs/core/langchain_core/tools/convert.py`
+
+### Basic Usage
+
+```python
+from langchain_core.tools import tool
+
+@tool
+def multiply(a: int, b: int) -> int:
+    """Multiply two numbers."""
+    return a * b
+```
+
+### Decorator Variants
+
+The decorator supports multiple usage patterns:
+
+#### No arguments (infers from function)
+```python
+@tool
+def search(query: str) -> str:
+    """Search the knowledge base."""
+    return ...
+```
+
+#### With custom name
+```python
+@tool("retrieve")
+def get_documents(query: str) -> str:
+    """Retrieve documents."""
+    return ...
+```
+
+#### With configuration
+```python
+@tool(
+    name="web_search",
+    description="Search the web for information",
+    return_direct=True
+)
+def search(query: str) -> str:
+    return ...
+```
+
+#### Wrapping a Runnable
+```python
+from langchain_core.tools import tool
+
+search_runnable = ...  # Some Runnable[dict, str]
+search_tool = tool("search", search_runnable, description="Search the web")
+```
+
+### Configuration Options
+
+#### `description: str | None = None`
+Tool description. Precedence:
+1. Explicit `description` argument
+2. Function docstring
+3. `args_schema` docstring (if provided)
+
+#### `return_direct: bool = False`
+Stop agent loop after execution.
+
+#### `args_schema: ArgsSchema | None = None`
+Explicit schema for tool inputs. If provided with `infer_schema=True`, the explicit schema takes precedence.
+
+#### `infer_schema: bool = True`
+Automatically generate schema from function signature. When `True` (default), creates `StructuredTool`. When `False`, creates simple `Tool` with single string input.
+
+#### `response_format: Literal["content", "content_and_artifact"] = "content"`
+Control how tool output is formatted.
+
+#### `parse_docstring: bool = False`
+Parse function docstring for argument descriptions following Google Python style:
+
+```python
+@tool(parse_docstring=True)
+def add(a: int, b: int) -> int:
+    """Add two numbers.
+    
+    Args:
+        a: First number
+        b: Second number
+    
+    Returns:
+        The sum
+    """
+    return a + b
+```
+
+#### `error_on_invalid_docstring: bool = True`
+When `parse_docstring=True`, raise `ValueError` for invalid Google-style docstrings. Set to `False` to log warnings instead.
+
+#### `extras: dict[str, Any] | None = None`
+Provider-specific configuration (e.g., Anthropic `cache_control`, `defer_loading`).
+
+### Reserved Argument Names
+
+Avoid naming tool arguments `config`, `run_manager`, or `callbacks` as these are injected by LangChain at runtime:
+- `config`: Shadowed by injected `RunnableConfig`, causing `TypeError`
+- `run_manager`, `callbacks`: Silently dropped from schema
+
+To access runtime information, use `ToolRuntime` parameter instead:
+
+```python
+from langchain_core.tools import tool, ToolRuntime
+
+@tool
+def my_tool(query: str, runtime: ToolRuntime) -> str:
+    # Access state, context, store via runtime
+    return ...
+```
+
+### Schema Inference Details
+
+When `infer_schema=True`, the decorator:
+1. Extracts all type-hinted parameters
+2. Excludes reserved names and injected arguments
+3. Creates a `StructuredTool` with a Pydantic model
+4. Injects `run_manager` and `config` at runtime if declared
+5. Optionally parses Google-style docstrings for descriptions
+
+Supported Pydantic annotations:
+- Pydantic v2 `Field` with `description`
+- Pydantic v1 `Field` via `pydantic.v1`
+- Direct string annotations: `Annotated[str, "Description"]`
+
 ## Concrete Implementations
 
 LangChain provides two concrete tool classes:
@@ -316,7 +453,172 @@ LangChain provides two concrete tool classes:
 ### `Tool` (simple.py)
 Single-input tool enforcing exactly one argument after schema parsing. Defaults to `{"tool_input": {"type": "string"}}` schema. Used for simple function wrappers and backward compatibility.
 
+**When to use:**
+- Simple string-input functions
+- Legacy code compatibility
+- When schema inference is disabled (`infer_schema=False`)
+
 ### `StructuredTool` (structured.py)
 Multi-argument tool with explicit schema-driven parsing. Each function parameter becomes a schema field (except injected args). Supports both sync (`func`) and async (`coroutine`) invocation. Preferred for agent tools with multiple named parameters.
 
+**When to use:**
+- Functions with multiple parameters
+- Type-safe parameter passing
+- Tools bound to language models with function calling
+
+**Class Methods:**
+
+#### `from_function(func, coroutine, name, description, ...) -> StructuredTool`
+Create a `StructuredTool` from a function or async coroutine, automatically inferring the schema.
+
 Both inherit from `BaseTool` and override `_run()` and `_arun()` to delegate to wrapped functions while preserving config and callbacks.
+
+## Injected Arguments and Runtime Context
+
+### InjectedToolArg
+
+Marker class for tool parameters that are injected at runtime rather than provided by the caller:
+
+```python
+from typing import Annotated
+from langchain_core.tools import tool, InjectedToolArg
+
+@tool
+def my_tool(x: int, injected: Annotated[str, InjectedToolArg]) -> str:
+    """Tool with injected parameter."""
+    return f"{x}: {injected}"
+```
+
+Injected arguments are automatically:
+- Excluded from the schema sent to language models
+- Re-injected at execution time from context or configuration
+
+### InjectedToolCallId
+
+Specialized injected argument for receiving the tool call ID from an agent:
+
+```python
+from typing import Annotated
+from langchain_core.tools import tool, InjectedToolCallId
+from langchain_core.messages import ToolMessage
+
+@tool
+def my_tool(
+    query: str,
+    tool_call_id: Annotated[str, InjectedToolCallId]
+) -> ToolMessage:
+    """Tool that returns a ToolMessage with its call ID."""
+    return ToolMessage(
+        content=f"Result for {query}",
+        tool_call_id=tool_call_id,
+        name="my_tool"
+    )
+```
+
+### ToolRuntime
+
+Access to execution context including state, context variables, and the config store:
+
+```python
+from langchain_core.tools import tool, ToolRuntime
+
+@tool
+def access_context(query: str, runtime: ToolRuntime) -> str:
+    """Access runtime context."""
+    # runtime.state: mutable state dict
+    # runtime.context: immutable context
+    # runtime.store: persistent store
+    # runtime.config: RunnableConfig
+    return ...
+```
+
+## Schema Format and JSON Serialization
+
+### Tool Schema Export
+
+Tools expose their schema via `get_input_jsonschema()` which returns a JSON Schema dict suitable for sending to language models. For function-based tools, this is generated from type hints and docstrings.
+
+Example:
+```python
+@tool(parse_docstring=True)
+def multiply(a: int, b: int) -> int:
+    """Multiply two integers.
+    
+    Args:
+        a: The first integer
+        b: The second integer
+    """
+    return a * b
+
+print(multiply.get_input_jsonschema())
+```
+
+Output:
+```json
+{
+    "title": "multiply",
+    "description": "Multiply two integers.",
+    "type": "object",
+    "properties": {
+        "a": {
+            "description": "The first integer",
+            "type": "integer"
+        },
+        "b": {
+            "description": "The second integer",
+            "type": "integer"
+        }
+    },
+    "required": ["a", "b"]
+}
+```
+
+### Pydantic Model Schema
+
+For explicit `args_schema`, the tool uses `model_json_schema()` to generate the JSON representation:
+
+```python
+from pydantic import BaseModel, Field
+from langchain_core.tools import StructuredTool
+
+class SearchInput(BaseModel):
+    query: str = Field(description="Search query")
+    limit: int = Field(default=10, description="Max results")
+
+search_tool = StructuredTool.from_function(
+    name="search",
+    func=search_fn,
+    args_schema=SearchInput,
+    description="Search the knowledge base"
+)
+```
+
+## Tool Binding to Language Models
+
+Language models with function calling support can bind tools to execute them as part of a chain:
+
+```python
+from langchain_core.tools import tool
+
+@tool
+def multiply(a: int, b: int) -> int:
+    """Multiply two numbers."""
+    return a * b
+
+model = ChatOpenAI(model="gpt-4").bind_tools([multiply])
+```
+
+When tools are bound:
+- The model receives their schema and can decide to call them
+- The model's output includes tool calls
+- Tool calls are matched to tool definitions and executed
+- Results are passed back to the model for further processing
+
+The `extras` field allows passing provider-specific configuration:
+
+```python
+@tool(extras={"cache_control": {"type": "ephemeral"}})
+def expensive_tool(query: str) -> str:
+    """An expensive tool with prompt caching."""
+    return ...
+```

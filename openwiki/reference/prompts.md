@@ -5,7 +5,7 @@ description: "API reference for LangChain prompt template classes, including Bas
 tags: [prompt, template, reference, api, base-class, string-template, chat-template, few-shot]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-11-13T08:16:35.902Z
+    at: 2026-11-15T08:15:26.682Z
 sources:
   - id: openwiki-source-269af2bb49a21bd6c548b3f0
     resource: repo://libs/core/langchain_core/prompt_values.py
@@ -19,7 +19,7 @@ sources:
     resource: repo://libs/core/langchain_core/prompts/prompt.py
   - id: openwiki-source-cf81d0ba0a387a7cd9b5dfb8
     resource: repo://libs/core/langchain_core/prompts/string.py
-generated: { by: "openwiki/0.5.0", at: "2026-11-13T08:16:35.902Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-11-15T08:15:26.682Z" }
 ---
 
 # Prompt Template APIs
@@ -742,7 +742,6 @@ Returns `prompt.input_variables`.
 
 ## See Also
 
-- [Prompts: Templates & Composition](/openwiki/prompts.md) — Conceptual overview and usage patterns
-- [Runnable Protocol](/openwiki/concepts/runnables.md) — Invoke, stream, and batch semantics
-<!-- openwiki: broken internal link [/openwiki/reference/example_selectors.md] file "/openwiki/reference/example_selectors.md" does not exist. Fix the href or restore the target, then delete this comment. -->
-- [Example Selectors](/openwiki/reference/example_selectors.md) — Dynamic example selection for few-shot learning
+- [Prompts: Templates & Composition](/openwiki/concepts/prompts.md) — Conceptual overview and usage patterns
+- [Runnable Protocol](/openwiki/reference/runnables.md) — Invoke, stream, and batch semantics
+- [Messages](/openwiki/reference/messages.md) — Message types and conversion utilities

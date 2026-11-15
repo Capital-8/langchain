@@ -8,6 +8,10 @@ sources:
     resource: repo://libs/core/langchain_core/language_models/chat_models.py
   - id: openwiki-source-a12395e96060f062d8ec1ca2
     resource: repo://libs/partners/anthropic/langchain_anthropic/__init__.py
+  - id: openwiki-source-7de1ace618efbdfd8bacb5cb
+    resource: repo://libs/partners/anthropic/langchain_anthropic/chat_models.py
+  - id: openwiki-source-04e3ac4f56ff2adb2b02de7d
+    resource: repo://libs/partners/anthropic/pyproject.toml
   - id: openwiki-source-1e66a9da38565f8901e651f4
     resource: repo://libs/partners/openai/langchain_openai/__init__.py
   - id: openwiki-source-738512768ef81ae009b097ac
@@ -16,10 +20,10 @@ sources:
     resource: repo://libs/partners/openai/pyproject.toml
   - id: openwiki-source-86b6689572ac828885d7d4b0
     resource: repo://libs/partners/README.md
-generated: { by: "openwiki/0.5.0", at: "2026-11-06T08:17:28.425Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-11-15T08:15:26.682Z" }
 verified:
   - by: openwiki/0.5.0
-    at: 2026-11-13T08:16:35.902Z
+    at: 2026-11-15T08:15:26.682Z
 ---
 
 # Partner Pattern: Provider Integration Framework
@@ -65,7 +69,8 @@ Example (from langchain-openai):
 [project]
 name = "langchain-openai"
 dependencies = [
-    "langchain-core>=1.7.0,<2.0.0",
+    "langchain-core>=1.8.0,<2.0.0",
+    "certifi>=2024.6.2",
     "openai>=2.45.0",
     "tiktoken>=0.7.0",
 ]
@@ -122,6 +127,12 @@ For OpenAI, this method orchestrates:
 3. API invocation via the OpenAI SDK
 4. Result parsing via `_create_chat_result()`
 
+For Anthropic, the pattern is similar:
+1. Format messages via `_format_messages()` to conform to Anthropic's schema
+2. Build payload via `_get_request_payload()`
+3. Call `_create()` on the synchronous client
+4. Format output via `_format_output()`
+
 #### `_llm_type` (property)
 
 A string identifier for logging, serialization, and tracing (e.g., `"openai"`, `"anthropic"`, `"ollama"`). Must be unique within the ecosystem.
@@ -146,13 +157,19 @@ If not implemented, `stream()` falls back to `invoke()`. Streaming is essential 
 - Fires callbacks (`run_manager.on_llm_new_token()`) for each chunk
 - Handles provider errors and maps them to LangChain error classes
 
+Anthropic's `_stream` similarly:
+- Sets `stream=True` on the request
+- Iterates event objects from the provider's streaming response
+- Converts events to chunks via `_make_message_chunk_from_anthropic_event()`
+- Accumulates usage metadata across chunks
+
 #### `_agenerate(messages, stop, run_manager, **kwargs) → ChatResult`
 
-Native async generation. If absent, `ainvoke` runs `_generate` in an executor. OpenAI implements this to use the `AsyncOpenAI` client for non-blocking I/O.
+Native async generation. If absent, `ainvoke` runs `_generate` in an executor. OpenAI and Anthropic both implement this to use their async clients for non-blocking I/O.
 
 #### `_astream(messages, stop, run_manager, **kwargs) → AsyncIterator[ChatGenerationChunk]`
 
-Async streaming. OpenAI wraps its async SDK's streaming with per-chunk timeouts to prevent indefinite hangs.
+Async streaming. OpenAI wraps its async SDK's streaming with per-chunk timeouts (controlled via `stream_chunk_timeout`) to prevent indefinite hangs on stalled streams.
 
 ## Message Conversion
 
@@ -170,14 +187,21 @@ Core message types in `langchain_core.messages`:
 
 ### Provider-Specific Conversion
 
-OpenAI message conversion (in `_convert_message_to_dict`):
+OpenAI message conversion (in `_convert_dict_to_message` and related):
 - `HumanMessage` → `{"role": "user", "content": ...}`
 - `AIMessage` → `{"role": "assistant", "content": ..., "tool_calls": [...]}` (if tool calls present)
 - `SystemMessage` → `{"role": "system" | "developer", "content": ...}` (respects `__openai_role__` field for developer role)
 - `ToolMessage` → `{"role": "tool", "tool_call_id": ..., "content": ...}`
 - `FunctionMessage` → `{"role": "function", "name": ..., "content": ...}` (legacy)
 
-Tool calls are parsed from the provider's response format (OpenAI uses `{"function": {"name": ..., "arguments": ...}}`) and wrapped as LangChain `ToolCall` objects carrying `id`, `name`, and `args`.
+Anthropic message conversion (in `_format_messages` and helpers):
+- Handles mid-conversation system messages (hoisting non-leading ones to the top-level `system` field)
+- Normalizes tool call IDs for Anthropic compatibility (which rejects IDs with `.` and `:` characters)
+- Merges runs of human/tool messages and deduplicates tool call blocks
+- Supports special content blocks like `tool_addition` and `tool_removal` for mid-conversation tool changes
+- Preserves cache control and citations metadata
+
+Tool calls are parsed from the provider's response format (OpenAI uses `{"function": {"name": ..., "arguments": ...}}`, Anthropic uses `{"type": "tool_use", "name": ..., "input": ...}`) and wrapped as LangChain `ToolCall` objects carrying `id`, `name`, and `args`.
 
 Reverse conversion (provider response → `AIMessage`) handles:
 - Extracting text content and tool invocation data
@@ -202,12 +226,14 @@ OpenAI's `bind_tools` accepts tools as:
 
 Each is converted to the provider's format via `convert_to_openai_tool()` (from `langchain_core.utils.function_calling`), which produces JSON Schema representations compatible with the provider's API.
 
+Anthropic's `bind_tools` similarly accepts the same formats and converts them using either `convert_to_openai_tool()` (for interop) or custom Anthropic-specific conversion.
+
 ### Function Calling Flow
 
 1. **Binding**: User calls `model.bind_tools([GetWeather, GetPopulation])`
-2. **Schema conversion**: Each tool is converted to OpenAI's `{"type": "function", "function": {...}}` format
+2. **Schema conversion**: Each tool is converted to the provider's format
 3. **Request encoding**: Tools are passed to the provider API alongside the message
-4. **Response parsing**: Provider returns tool calls; OpenAI parser extracts them into `ToolCall` objects
+4. **Response parsing**: Provider returns tool calls; parsers extract them into `ToolCall` objects
 5. **Tool execution**: Framework executes each tool; results become `ToolMessage` objects
 6. **Feedback**: `ToolMessage` objects are added to the message history for next model call
 
@@ -217,10 +243,10 @@ Each is converted to the provider's format via `convert_to_openai_tool()` (from 
 - `"none"`: Never call a tool
 - `"auto"`: Model decides
 - `"any"` / `"required"` / `True`: Force at least one tool call
-- `{"type": "function", "function": {"name": "GetWeather"}}`: Force a specific tool
+- `{"type": "function", "function": {"name": "GetWeather"}}` (OpenAI) or `{"type": "tool", "name": "GetWeather"}` (Anthropic): Force a specific tool
 - `None` / `False`: Use provider default
 
-OpenAI normalizes aliases (e.g., `"any"` → `"required"`) and handles both string shortcuts and dicts.
+OpenAI normalizes aliases (e.g., `"any"` → `"required"`) and handles both string shortcuts and dicts. Anthropic similarly normalizes and supports its own dict format.
 
 ### Strict Mode
 
@@ -295,22 +321,37 @@ class BaseChatOpenAI(BaseChatModel):
     top_p: float | None = None
     frequency_penalty: float | None = None
     presence_penalty: float | None = None
-    api_key: SecretStr | None = Field(alias="api_key", default=None)
-    base_url: str | None = Field(alias="base_url", default=None)
-    timeout: float | tuple | None = Field(alias="timeout", default=None)
+    openai_api_key: SecretStr | Callable[[], str] | None = Field(alias="api_key", default=None)
+    openai_api_base: str | None = Field(alias="base_url", default=None)
+    request_timeout: float | tuple[float, float] | None = Field(alias="timeout", default=None)
     max_retries: int | None = None
     model_kwargs: dict[str, Any] = Field(default_factory=dict)
 ```
 
+Anthropic's example:
+
+```python
+class ChatAnthropic(BaseChatModel):
+    model: str = Field(alias="model_name")
+    max_tokens: int | None = Field(default=None, alias="max_tokens_to_sample")
+    temperature: float | None = None
+    anthropic_api_key: SecretStr = Field(default=SecretStr(""), alias="api_key")
+    anthropic_api_url: str | None = Field(default=None, alias="base_url")
+    default_request_timeout: float | None = Field(None, alias="timeout")
+    max_retries: int = 2
+    model_kwargs: dict[str, Any] = Field(default_factory=dict)
+```
+
 Key patterns:
-- **`model_kwargs`**: Catch-all dict for unsupported parameters; passed directly to the provider API
-- **Aliases**: Support alternative field names (e.g., `model_name` aliased to `"model"`)
-- **Defaults**: Reasonable defaults inferred from environment or provider (e.g., `OPENAI_API_KEY`)
+- **`model_kwargs`**: Catch-all dict for unsupported parameters; passed directly to the provider API via `_build_model_kwargs()` which merges constructor kwargs with model_kwargs
+- **Aliases**: Support alternative field names (e.g., `model_name` aliased to `"model"`, `api_key` aliased to `"openai_api_key"`)
+- **Defaults**: Reasonable defaults inferred from environment or provider (e.g., `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`)
 - **SecretStr**: Sensitive fields like API keys are automatically redacted in logs
+- **Callables**: API keys can be sync or async callables for runtime refresh (`Callable[[], str]` or `Callable[[], Awaitable[str]]`)
 
 ### Environment Variable Fallback
 
-Constructors read environment variables if explicit values are not provided:
+Constructors read environment variables if explicit values are not provided. OpenAI's pattern:
 
 ```python
 openai_api_key = Field(default=None, ...)  # Env: OPENAI_API_KEY
@@ -318,7 +359,14 @@ openai_api_base = Field(default=None, ...)  # Env: OPENAI_API_BASE, then OPENAI_
 openai_organization = Field(default=None, ...) # Env: OPENAI_ORG_ID
 ```
 
-The `from_env()` utility and Pydantic validators orchestrate this fallback.
+Anthropic's pattern:
+
+```python
+anthropic_api_key = Field(default=SecretStr(""), alias="api_key")  # Env: ANTHROPIC_API_KEY
+anthropic_api_url = Field(default=None, alias="base_url")  # Env: ANTHROPIC_API_URL, then ANTHROPIC_BASE_URL
+```
+
+The `from_env()` utility and Pydantic validators orchestrate this fallback. The `validate_environment()` method runs post-init to resolve credentials, validate configuration, and apply LangSmith gateway settings.
 
 ### Endpoint Overrides
 
@@ -346,47 +394,23 @@ model = ChatOpenAI(
 )
 ```
 
-OpenAI's implementation handles proxy auto-detection, socket options, and SSL verification, with fallback to sane defaults.
+OpenAI's implementation handles proxy auto-detection, socket options, and SSL verification, with fallback to sane defaults. Anthropic similarly supports custom HTTP clients and proxy configuration.
 
-## Testing Patterns
+### Model-Specific Validation
 
-### StandardTests Conformance
+Partners implement validators to detect model capabilities and enforce constraints. OpenAI's `validate_temperature` validator:
+- For `o1` models: Sets `temperature=1` if not provided (o1 requires temperature=1)
+- For `gpt-5` models (non-chat): Removes non-1 temperature values when reasoning is enabled
 
-Partner packages use `langchain-tests` (in `libs/standard-tests/`) to run a standard test suite verifying:
-- **Chat model contract**: `invoke`, `stream`, `batch`, async variants all work
-- **Tool calling**: `bind_tools` produces correct schemas and parses responses
-- **Structured output**: `with_structured_output` works with Pydantic/dict schemas
-- **Serialization**: Models can be dumped/loaded via `to_dict()`/`from_dict()`
-- **Callbacks**: Streaming callbacks fire at the right times
+Anthropic enforces `thinking` parameter compatibility and validates `output_config.effort` values.
 
-Example test registration (from OpenAI's conftest):
+## Error Handling & Mapping
 
-```python
-def test_standard_base_model_params():
-    """Test standard parameters work."""
-    model = ChatOpenAI(model="gpt-4.1-mini")
-    assert model.invoke("hello") is not None
-```
+Partner packages map provider-specific errors to LangChain's standardized error hierarchy (from `langchain_core.exceptions`), enabling generic error catching while preserving provider context.
 
-### Real vs. Mock API Testing
-
-- **Real API tests**: Hit the actual provider (slow, require API key, counted against quota). Used for integration tests.
-- **Mock/recorded tests**: Use `vcrpy` to record HTTP interactions and replay them. Fast, deterministic, no API key required.
-
-OpenAI uses recorded cassettes in `tests/cassettes/` containing fixture responses for common scenarios.
-
-### Test Categories
-
-1. **Unit tests**: Isolated functionality (message conversion, schema validation, error mapping)
-2. **Integration tests**: Full workflows with mocked API responses
-3. **Snapshot tests** (via `syrupy`): Capture and diff model output, catching regressions in response parsing
-
-## Error Mapping
-
-Partner packages should map provider-specific errors to LangChain's standardized error hierarchy (from `langchain_core.exceptions`):
+### OpenAI Error Mapping
 
 ```python
-# OpenAI example
 openai.BadRequestError → OpenAIInvalidRequestError(ModelInvalidRequestError)
 openai.AuthenticationError → OpenAIAuthenticationError(ModelAuthenticationError)
 openai.RateLimitError → OpenAIRateLimitError(ModelRateLimitError)
@@ -395,7 +419,23 @@ openai.APITimeoutError → OpenAITimeoutError(ModelTimeoutError)
 openai.NotFoundError → OpenAIModelNotFoundError(ModelNotFoundError)
 ```
 
-Subclasses inherit from both the provider's exception and LangChain's abstract class, allowing framework code to catch errors generically while preserving provider context.
+Special cases:
+- Context window exceeded errors (detected by message content) → `OpenAIContextOverflowError(ContextOverflowError)`
+- Structured output schema errors → Helpful warnings suggesting `method="function_calling"` fallback
+
+### Anthropic Error Mapping
+
+```python
+anthropic.BadRequestError → AnthropicInvalidRequestError(ModelInvalidRequestError)
+anthropic.AuthenticationError → AnthropicAuthenticationError(ModelAuthenticationError)
+anthropic.RateLimitError → AnthropicRateLimitError(ModelRateLimitError)
+anthropic.APIConnectionError → AnthropicConnectionError(ModelConnectionError)
+anthropic.APITimeoutError → AnthropicTimeoutError(ModelTimeoutError)
+anthropic.NotFoundError → AnthropicModelNotFoundError(ModelNotFoundError)
+anthropic.OverloadedError → AnthropicOverloadedError(ModelAPIError)
+```
+
+Error handlers (`_handle_anthropic_bad_request`, `_handle_anthropic_api_error`) inspect error messages for specific conditions (e.g., "prompt is too long") and map to appropriate LangChain exceptions.
 
 ## Model Profiles
 
@@ -414,6 +454,8 @@ _PROFILES = {
 }
 ```
 
+Anthropic stores profiles similarly in `data/_profiles.py`, declaring capabilities like `tool_calling`, `vision`, `output_config_support`, etc.
+
 Profiles are loaded at model init via `_resolve_model_profile()` and exposed on the instance, enabling runtime capability checks:
 
 ```python
@@ -429,28 +471,66 @@ Partner implementations should provide native async variants where possible:
 - **`_astream()`**: Async streaming with proper timeout handling
 - **Callable API keys**: Support `Callable[[], Awaitable[str]]` for async key fetching
 
-OpenAI's async implementation uses `openai.AsyncOpenAI` and includes per-chunk streaming timeouts (`stream_chunk_timeout`) to prevent indefinite hangs on stalled streams.
+OpenAI's async implementation uses `openai.AsyncOpenAI` and includes per-chunk streaming timeouts (`stream_chunk_timeout`) to prevent indefinite hangs on stalled streams. The timeout is controlled via environment variable `LANGCHAIN_OPENAI_STREAM_CHUNK_TIMEOUT_S` (default 120 seconds) or constructor parameter.
+
+Anthropic similarly provides `_agenerate()` and `_astream()` using its async client, and `_aparse()` helper for parsing async responses.
 
 ## Version & Compatibility Management
 
 Partners manage compatibility across:
 1. **langchain-core versions**: Ensure dependency bounds match breaking changes
 2. **Provider SDK versions**: Pin to avoid upstream API changes
-3. **Python versions**: Declare supported Python ranges (e.g., `>=3.10`)
-4. **Model evolution**: Detect model capabilities and adapt behavior (e.g., strict mode support, Responses API availability)
+3. **Python versions**: Declare supported Python ranges (e.g., `>=3.11.0,<4.0.0`)
+4. **Model evolution**: Detect model capabilities and adapt behavior (e.g., strict mode support, Responses API availability, Anthropic's thinking support)
 
 OpenAI uses validators to detect model capabilities (e.g., `validate_temperature` for o1/gpt-5 models) and warnings to guide users toward compatible alternatives.
+
+Anthropic similarly adapts behavior based on model name (e.g., `claude-opus-5` vs `claude-opus-5-5`) for features like thinking, vision, and extended thinking.
 
 ## Extension Boundary
 
 Partners are the extension point for:
-- **Provider-specific features**: Built-in tools (web search), reasoning modes, audio I/O
+- **Provider-specific features**: Built-in tools (web search, code execution), reasoning modes (thinking, extended thinking), audio I/O
 - **Vendor variants**: Azure OpenAI, DeepSeek, OpenRouter (inheriting from base OpenAI or building independently)
 - **Custom message formats**: Non-standard blocks (Anthropic thinking, reasoning content) stored in `additional_kwargs` or content lists
+- **Mid-conversation tool changes**: Anthropic's `tool_addition`/`tool_removal` blocks enabling dynamic tool set updates
 
 The core framework abstractions (BaseChatModel, BaseMessage, Runnable) remain stable; partners handle diversity at the integration boundary.
 
 ---
+
+## Testing Patterns
+
+### StandardTests Conformance
+
+Partner packages use `langchain-tests` (in `libs/standard-tests/`) to run a standard test suite verifying:
+- **Chat model contract**: `invoke`, `stream`, `batch`, async variants all work
+- **Tool calling**: `bind_tools` produces correct schemas and parses responses
+- **Structured output**: `with_structured_output` works with Pydantic/dict schemas
+- **Serialization**: Models can be dumped/loaded via `to_dict()`/`from_dict()`
+- **Callbacks**: Streaming callbacks fire at the right times
+
+Example test registration (from OpenAI's conftest):
+
+```python
+def test_standard_base_model_params():
+    """Test standard parameters work."""
+    model = ChatOpenAI(model="gpt-4o-mini")
+    assert model.invoke("hello") is not None
+```
+
+### Real vs. Mock API Testing
+
+- **Real API tests**: Hit the actual provider (slow, require API key, counted against quota). Used for integration tests.
+- **Mock/recorded tests**: Use `vcrpy` to record HTTP interactions and replay them. Fast, deterministic, no API key required.
+
+OpenAI uses recorded cassettes in `tests/cassettes/` containing fixture responses for common scenarios.
+
+### Test Categories
+
+1. **Unit tests**: Isolated functionality (message conversion, schema validation, error mapping)
+2. **Integration tests**: Full workflows with mocked API responses
+3. **Snapshot tests** (via `syrupy`): Capture and diff model output, catching regressions in response parsing
 
 ## Standard Tests Usage
 

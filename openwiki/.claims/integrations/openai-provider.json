@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:72ce8f35d773650abee85c4df5de86f4a91fc15c35b521e29656963d1f4303a3",
+  "pageVersion": "sha256:36d9477625a20eb5a1c73da53d0d2a27a9eb10ccc05207336fc9eced83b6ed0a",
   "claims": [
     {
       "id": "claim_f1104a8334664647842619daa7f61e83",
@@ -26,11 +26,11 @@
       "evidence": [
         {
           "resource": "repo://libs/partners/openai/langchain_openai/chat_models/base.py#L1404-L1461",
-          "version": "repo-lines-v1:sha256:0a83eb2c632cea5e5aaff9f5728698b529ecf8bd3644072d7b124dd3b5a2ab9d:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1YWM3ZmU4ZWY4YzhhMzU1ZDcxNDkwMzBiYzI5M2U5NDhiZDM2Nzg4ZmUzZWZmOGQwM2MyNTNlMjBmYWYxMWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1MDMyZTk2NGQwOTMyMzUxZTVkMTg1MjY5MjgxYjE3MWEzYTA5YjA4YjI4NmU2NjFlYTQ3MDMyM2M4MmViNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE4YjZhMTIwNzE2ZjI1NGNhZjA1N2E0Y2U1N2NkZjhlMDhjZWViYmIyYTViZTIwNDkwNzFiOTUwZmU2NGUzZTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIwNjMwYTZiYzQzNTZiN2I4NzgxNTc0YjQ4Njg3YjE0YmM0OTdhMzg3MzI5Y2JhYjgzYjYzNTMwYmY0ZjJlYzUifQ"
+          "version": "repo-lines-v1:sha256:56ff734a156b67b321f5f8c000e146029d317050937a2d98ff8a2b28198bebb6:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlZmRhNjgxNTZmYmRlNWUxMjlkYmZiMGJkZjFkOWU1OWEwMDA4YWFiZjViY2U5MTY0MzIyOWM1ZTgxNjMwOTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwNzFhYmI0YzUzZDE1ZGE3OGI4NTlhMjk1ZDQ3ZmFjY2E1MzhhNzhlNThjNTJkZjRhNWY3MzNjOGY2ZjZkNjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY0MjJiNTFjMjkwNzlkM2E4ZjYxMTRjZWYyYjdkZDY2NzU5NTY5ZDA2OTNlODcxYzNmYjg4NGQ4NWUxZDA3YmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkMTcyMGY4NDQ3ODQ5ZDUzMjZiODZlYjZhNWIzMTM0NjE5YjA2NmEwNWQ5ZmRhOTVhZDhmNmEzMjgxZTQ0NmMifQ"
         },
         {
-          "resource": "repo://libs/partners/openai/langchain_openai/chat_models/base.py#L810-L860",
-          "version": "repo-lines-v1:sha256:003a6dab73ea8fde5dc6459b1b513510f5f2edaf2d067675483617e4bbadc10c:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg0NWZkNDk1ZWU5OWQ1OWFkN2VlNWNlNjc3NzY4NTA2OWZlYzJiMzFlN2VlOWI0ZjlhMjA2M2RlMWRkNjFhNjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2YTcxNTI1NzJlZTg0ZjEwOTA2Yzc0YjlmMmE5MjQzNGRkYWIwZTNjNDI4MTNiMDRlNTk3ZWZjZWM5NTFiMjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ4YzBjYzA4MjViNjY2MWI1ZmM0YWE1MjQ5NmJhOGM5ODIxNTY3MzFiNTM2NTBlYjhiYTYxYmRmNjI2ZmNlNGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMyNjAzZjZjNDViZmIxODk0YWE5ZWMzY2U4MDJhMTNlMDA5YzcyNDgyMzZmOWIxMzdjMTNiODFjZmQ1NGNmYmUifQ"
+          "resource": "repo://libs/partners/openai/langchain_openai/chat_models/base.py#L814-L864",
+          "version": "repo-lines-v1:sha256:bf96495a283eac05f6522d00a63dff41926406e63dcdc52005a9e1bffc487d9f:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg0NWZkNDk1ZWU5OWQ1OWFkN2VlNWNlNjc3NzY4NTA2OWZlYzJiMzFlN2VlOWI0ZjlhMjA2M2RlMWRkNjFhNjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2YTcxNTI1NzJlZTg0ZjEwOTA2Yzc0YjlmMmE5MjQzNGRkYWIwZTNjNDI4MTNiMDRlNTk3ZWZjZWM5NTFiMjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ4YzBjYzA4MjViNjY2MWI1ZmM0YWE1MjQ5NmJhOGM5ODIxNTY3MzFiNTM2NTBlYjhiYTYxYmRmNjI2ZmNlNGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMyNjAzZjZjNDViZmIxODk0YWE5ZWMzY2U4MDJhMTNlMDA5YzcyNDgyMzZmOWIxMzdjMTNiODFjZmQ1NGNmYmUifQ"
         }
       ]
     },
@@ -193,10 +193,40 @@
           "version": "repo-lines-v1:sha256:6a2bc0acf9c7ab8c84f8d42d61f51b58cf5dc7885fc30031d191b03731b43965:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5YWU1NTg2NWMyNjg4Yzk5ZGE3NDE3N2M0M2Q1NTIyNzQ2Mjg3NzRiMjNiN2VhN2ZiNjRhZmE1YmRiYzk1MTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVlMjMxMTc2NmRmNWU3NjliZWU1MTE0YjI0MzIzYzFhMjhkMWY0ZWQxNDE0Y2FhOGJjMjAwZDllNjM0MTQwMzEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBkOWU5OGFkZWMxZGIyMjQxMGRjYTA1NGNmY2UwNmFjOGEwYzA2NDgyMzBjOWU1YmE5MWE2MGU3NzNmZjc3MTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhZjlkMzcwNmEyMzBmOWRjMWQwMjk0Mjc5ODY0ZmQzYTRmMzNmMWVmYmU4Njc2MmI0Njk2MGI2MzFhODBhZWEifQ"
         }
       ]
+    },
+    {
+      "id": "claim_9f22a1b8f3d34d12890d30d20347d4be",
+      "statement": "OpenAIModelRouterMiddleware is an experimental agent middleware that uses the Decisions API to route requests among multiple models based on a single human message; it stores the routing decision as ModelRoute (choice, probabilities, confidence) in agent state; handles image URLs by replacing them with placeholders and retries if rejected (HTTP 400/413) with images replaced.",
+      "evidence": [
+        {
+          "resource": "repo://libs/partners/openai/langchain_openai/middleware/model_router.py#L80-L100",
+          "version": "repo-lines-v1:sha256:19172a700e3c9abd919d3e870170f6358df96d84a9a6b3ceeb9c4383377744a2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5NDA2YWZiY2ZlNjYyMTgxOGU1M2E3OWU2NzU5MzYxNTAxNmE0Y2IyZWUzYTI2M2U5MGYwNDlmZDU4ZGNiOWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllYjg1ZDkxNWE5ZjdjMDk4OWY0NjBkNjlhMTU4NjYxZmY3MjA3MTU2ZTI4ZDRkZTJmOTUzYzgzOGM1NzQxMGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUxZmEzNDc0ZTgzOTkyY2VmMjRiMGFmNTM4ZmQzYTc1MGJjMDY5MGMxNWFiZGZiMWNkODY4MmJmMWNmOGY1NTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNiYWVhMmM0NzhjZTcwNjhmYWEwYmFmODQyYjhiOGU4MzVjN2M4Y2UxNjVhMTU4OWJjMGM4MWE0NTE1NjU5NjcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_88974b1569204a8dae6fe3248fefe4e6",
+      "statement": "OpenAIModerationMiddleware is an agent middleware that uses OpenAI's moderation endpoint to flag unsafe content at input, output, or tool-result stages; supports four exit behaviors (error, end, replace) and accepts optional pre-configured sync and async OpenAI clients.",
+      "evidence": [
+        {
+          "resource": "repo://libs/partners/openai/langchain_openai/middleware/openai_moderation.py#L49-L89",
+          "version": "repo-lines-v1:sha256:2769b4fd0fe785f4b119f3bcb504284e6caecf4e74df859fca174e4498739851:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE5OGRiNTE0NDk0MDZmMjE1N2RmMGZmNWFhNGI2NGI5MDAxMjc0YzQ0MDVlZDRjOTBhOTdlZTkzYzg5MzI5NDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1Y2Q4Y2FiNTQ5NDBiOGZjMjU1MmQ2NTA3ZGY3MjYyYWMyM2E4Y2U3NGI5YmExMmRmMGMwOTkwNmY1MzVhZjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM4OGJlNGY3NjY1ZjhkMDgwMjcwYTBhMmEwYTY1Y2I0MDQ3OTgyNDZhNjYwMjg5MTA2OGE3YWQxZGIxOTUyMjkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a2460e7cc2324372b25f2fe07ff9a2a3",
+      "statement": "OpenAIDecisions.invoke() and ainvoke() construct a DecisionRequest payload and POST to /decisions endpoint; responses include model_name, answers dict keyed by question name (with answer objects containing probability/probabilities/score fields), usage metadata, and request_id for tracing.",
+      "evidence": [
+        {
+          "resource": "repo://libs/partners/openai/langchain_openai/decisions/base.py#L293-L315",
+          "version": "repo-lines-v1:sha256:f466f04c55e0638199251fce4a9a60e5b62d9e847f4a8ef3f34a0393c7b8723b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM5ZjFhNTk2ZGYzMDAxZGI0ZjIyNDI2NTA3YWZiNWZjYjI3NzcxYjhlNGFiMTlhMTE5Y2UzYTAyNDJhNDdjYjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjMmYyMjZkM2JlMTkzODM4Y2NmYjFiN2VmOWZmNWVkY2Q2NDA5ZGVjZGRmNGViNmRjYjgzM2E1OWI5YmUxMWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ5ZTE1ZmYzMzcxYWE2MGM4M2I3M2JmNTZkYTQyZmQ0YTE0NzNjZmIyMWZhYzllMTJmYTk1OGY5Zjg2YzQ4NTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZjN2ZiZjE0NDFkNDgxZmRhNzYxMTUzMDYyNzNiYWYzM2QwMDM5YzY2NDU4N2MzMzEwOWMzZTY3NDAwZTYxYzIifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-13T08:16:35.902Z"
+    "at": "2026-11-15T08:15:26.682Z"
   }
 }

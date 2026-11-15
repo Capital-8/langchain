@@ -5,7 +5,7 @@ description: API reference for pytest fixtures, mock implementations, and test u
 tags: [unit-tests, pytest, fixtures, testing, reference, api]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-11-13T08:16:35.902Z
+    at: 2026-11-15T08:15:26.682Z
 sources:
   - id: openwiki-source-727aef6a92fb635fdbb41cd6
     resource: repo://libs/core/tests/unit_tests/conftest.py
@@ -21,7 +21,7 @@ sources:
     resource: repo://libs/langchain_v1/tests/unit_tests/agents/conftest.py
   - id: openwiki-source-6904a2d923d0abd0c1af93bd
     resource: repo://libs/langchain_v1/tests/unit_tests/agents/model.py
-generated: { by: "openwiki/0.5.0", at: "2026-11-13T08:16:35.902Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-11-15T08:15:26.682Z" }
 ---
 
 ## Overview
@@ -34,18 +34,27 @@ This page documents the fixtures, helper functions, and mock implementations ava
 
 **Location**: `repo://libs/core/tests/unit_tests/conftest.py`
 
-The `blockbuster` fixture (autouse=True) prevents blocking I/O in async code by allowing specific blocking operations only in designated locations. This enforces non-blocking patterns in async functions.
+The `blockbuster` fixture (autouse=True) prevents blocking I/O in async code by permitting specific blocking operations only in designated locations. This enforces non-blocking patterns in async functions.
 
 ```python
 @pytest.fixture(autouse=True)
 def blockbuster() -> Iterator[BlockBuster]:
     """Prevents blocking I/O in async code."""
     with blockbuster_ctx("langchain_core") as bb:
-        bb.functions["os.stat"].can_block_in(
-            "langchain_core/_api/internal.py", "is_caller_internal"
-        ).can_block_in(
-            "langchain_core/runnables/base.py", "__repr__"
-        )
+        for func in ["os.stat", "os.path.abspath"]:
+            (
+                bb.functions[func]
+                .can_block_in("langchain_core/_api/internal.py", "is_caller_internal")
+                .can_block_in("langchain_core/runnables/base.py", "__repr__")
+            )
+        for func in ["os.stat", "io.TextIOWrapper.read"]:
+            bb.functions[func].can_block_in(
+                "langsmith/client.py", "_default_retry_config"
+            )
+        for bb_function in bb.functions.values():
+            bb_function.can_block_in(
+                "freezegun/api.py", "_get_cached_module_attributes"
+            )
         yield bb
 ```
 
@@ -60,7 +69,9 @@ Replaces random UUID generation with deterministic, sequential values for reprod
 ```python
 @pytest.fixture
 def deterministic_uuids(mocker: MockerFixture) -> MockerFixture:
-    side_effect = (UUID(f"00000000-0000-4000-8000-{i:012}", version=4) for i in range(10000))
+    side_effect = (
+        UUID(f"00000000-0000-4000-8000-{i:012}", version=4) for i in range(10000)
+    )
     return mocker.patch("uuid.uuid4", side_effect=side_effect)
 ```
 
@@ -77,9 +88,9 @@ def test_trace_snapshot(deterministic_uuids, snapshot):
 
 **Location**: `repo://libs/core/tests/unit_tests/conftest.py`
 
-Implements two custom markers and command-line options:
+Implements custom `@pytest.mark.requires` marker for conditional test execution based on optional dependencies.
 
-**`@pytest.mark.requires(package_name)`**: Auto-skips tests when optional dependencies are missing.
+**`@pytest.mark.requires(package_name)`**: Auto-skips tests when packages are missing; fails if `--only-extended` is used and a required package is not installed.
 
 ```python
 @pytest.mark.requires("anthropic", "openai")
@@ -89,7 +100,7 @@ def test_multi_provider():
 ```
 
 **Command-line options**:
-- `--only-extended`: Run only tests marked with `@pytest.mark.requires`; fail if dependencies missing
+- `--only-extended`: Run only tests marked with `@pytest.mark.requires`; fail if any required dependencies are missing
 - `--only-core`: Run only non-extended tests (skip all `@pytest.mark.requires`)
 
 ### pytest_addoption Hook
@@ -100,15 +111,16 @@ Adds custom command-line options:
 
 ```python
 def pytest_addoption(parser: pytest.Parser) -> None:
+    """Add custom command line options to pytest."""
     parser.addoption(
         "--only-extended",
         action="store_true",
-        help="Only run extended tests",
+        help="Only run extended tests. Does not allow skipping any extended tests.",
     )
     parser.addoption(
         "--only-core",
         action="store_true",
-        help="Only run core tests",
+        help="Only run core tests. Never runs any extended tests.",
     )
 ```
 
@@ -116,7 +128,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 **Location**: `repo://libs/langchain_v1/tests/unit_tests/agents/conftest.py`
 
-Agent tests use parametrized fixtures to test across multiple storage backends. Control backend selection via `LANGGRAPH_TEST_FAST` environment variable.
+Agent tests use parametrized fixtures to test across multiple storage backends. Control backend selection via `LANGGRAPH_TEST_FAST` environment variable (default: `true`).
 
 ### sync_checkpointer Fixture
 
@@ -136,7 +148,7 @@ def sync_checkpointer(request: pytest.FixtureRequest) -> Iterator[BaseCheckpoint
     # ... more backends
 ```
 
-**Available backends** (when `LANGGRAPH_TEST_FAST=true` or false):
+**Available backends**:
 - `memory` (always available)
 - `sqlite`, `postgres`, `postgres_pipe`, `postgres_pool` (when `LANGGRAPH_TEST_FAST=false`)
 
@@ -194,9 +206,127 @@ def anyio_backend() -> str:
 
 ## Fake/Mock Chat Models
 
-**Location**: `repo://libs/core/tests/unit_tests/fake/`
+**Location**: `repo://libs/core/langchain_core/language_models/fake_chat_models.py`
 
 Mock implementations enable testing without API calls.
+
+### FakeChatModel
+
+The simplest fake chat model that returns a fixed response.
+
+```python
+class FakeChatModel(SimpleChatModel):
+    """Fake Chat Model wrapper for testing purposes."""
+    
+    def _call(self, messages: list[BaseMessage], ...) -> str:
+        return "fake response"
+```
+
+**Usage**:
+
+```python
+model = FakeChatModel()
+result = model.invoke([HumanMessage("Hello")])
+# Returns AIMessage(content="fake response")
+```
+
+### FakeListChatModel
+
+Cycles through a fixed list of string responses.
+
+```python
+class FakeListChatModel(SimpleChatModel):
+    responses: list[str]
+    """List of responses to **cycle** through in order."""
+    sleep: float | None = None
+    """Optional sleep time in seconds between responses."""
+    i: int = 0
+    """Internally incremented after every model invocation."""
+    error_on_chunk_number: int | None = None
+    """If set, raise an error on the specified chunk number during streaming."""
+```
+
+**Usage**:
+
+```python
+model = FakeListChatModel(responses=["Hello", "Hi", "Hey"])
+response = model.invoke("How are you?")
+# Returns AIMessage(content="Hello")
+
+response = model.invoke("What's up?")
+# Returns AIMessage(content="Hi")
+
+# Streaming
+chunks = list(model.stream("Query"))
+# Returns character-level chunks
+```
+
+### GenericFakeChatModel
+
+Cycles through a sequence of AIMessage objects; useful for testing streaming with complex messages.
+
+```python
+class GenericFakeChatModel(BaseChatModel):
+    messages: Iterator[AIMessage | str]
+    """Get an iterator over messages."""
+    
+    def _stream(self, messages: list[BaseMessage], ...) -> Iterator[ChatGenerationChunk]:
+        """Breaks messages into character-level chunks for streaming tests."""
+```
+
+**Usage**:
+
+```python
+from itertools import cycle
+from langchain_core.language_models import GenericFakeChatModel
+from langchain_core.messages import AIMessage
+
+messages = cycle([AIMessage(content="hello"), AIMessage(content="goodbye")])
+model = GenericFakeChatModel(messages=messages)
+
+# Invoke returns first message
+response = model.invoke("query")
+# Returns AIMessage(content="hello")
+
+# Stream returns character-level chunks
+chunks = list(model.stream("query"))
+# Returns [AIMessageChunk(content="h"), AIMessageChunk(content="e"), ...]
+```
+
+### ParrotFakeChatModel
+
+Echoes the input message (last message in the conversation) back as an AIMessage.
+
+```python
+class ParrotFakeChatModel(BaseChatModel):
+    """Returns the last message from input unchanged."""
+    
+    def _generate(self, messages: list[BaseMessage], ...) -> ChatResult:
+        return ChatResult(generations=[ChatGeneration(message=messages[-1])])
+```
+
+**Usage**:
+
+```python
+from langchain_core.language_models import ParrotFakeChatModel
+
+model = ParrotFakeChatModel()
+response = model.invoke([HumanMessage("Hello!")])
+# Returns HumanMessage(content="Hello!")
+```
+
+### FakeMessagesListChatModel
+
+Cycles through a fixed list of BaseMessage objects (not just strings).
+
+```python
+class FakeMessagesListChatModel(BaseChatModel):
+    responses: list[BaseMessage]
+    """List of responses to **cycle** through in order."""
+    sleep: float | None = None
+    """Optional sleep time in seconds between responses."""
+    i: int = 0
+```
 
 ### FakeToolCallingModel
 
@@ -210,11 +340,14 @@ class FakeToolCallingModel(BaseChatModel):
     structured_response: Any | None = None
     index: int = 0
     tool_style: Literal["openai", "anthropic"] = "openai"
+    
+    def _generate(self, messages: list[BaseMessage], ...) -> ChatResult:
+        """Returns scripted tool calls or structured responses."""
 ```
 
 **Parameters**:
 
-- `tool_calls`: List of lists, where each inner list contains tool calls for that turn. The model cycles through or increments based on mode.
+- `tool_calls`: List of lists, where each inner list contains tool calls for that turn. Cycles or increments based on native mode.
 - `structured_response`: Response for structured output mode (BaseModel, dataclass, or dict).
 - `index`: Internal counter; auto-increments after each invoke.
 - `tool_style`: Format for bind_tools output ("openai" or "anthropic").
@@ -243,56 +376,7 @@ model = FakeToolCallingModel(
 result = model.invoke([...], response_format=...)
 ```
 
-### GenericFakeChatModel
-
-**Location**: `repo://libs/core/tests/unit_tests/fake/test_fake_chat_model.py`
-
-Cycles through a sequence of AIMessage objects; useful for testing streaming.
-
-```python
-from itertools import cycle
-from langchain_core.language_models import GenericFakeChatModel
-from langchain_core.messages import AIMessage
-
-messages = cycle([AIMessage(content="response1"), AIMessage(content="response2")])
-model = GenericFakeChatModel(messages=messages)
-
-# Invoke returns response1
-response = model.invoke("query")
-# Stream returns character-level chunks
-chunks = list(model.stream("query"))
-```
-
-### FakeListChatModel
-
-Cycles through a fixed list of string responses.
-
-```python
-from langchain_core.language_models import FakeListChatModel
-
-model = FakeListChatModel(responses=["Hello", "Hi", "Hey"])
-response = model.invoke("How are you?")
-# Returns AIMessage(content="Hello")
-
-response = model.invoke("What's up?")
-# Returns AIMessage(content="Hi")
-```
-
-### ParrotFakeChatModel
-
-Echoes the input message back as an AIMessage.
-
-```python
-from langchain_core.language_models import ParrotFakeChatModel
-
-model = ParrotFakeChatModel()
-response = model.invoke("Hello!")
-# Returns AIMessage(content="Hello!")
-```
-
 ### FakeEmbeddings
-
-**Location**: Provided by langchain_core
 
 Generates deterministic embeddings based on input hash.
 
@@ -312,20 +396,23 @@ vectors = embeddings.embed_documents(["hello", "world"])
 
 ## Callback Test Utilities
 
-### FakeCallbackHandler
-
 **Location**: `repo://libs/core/tests/unit_tests/fake/callbacks.py`
 
-Tracks callback events for testing. Maintains counters for all lifecycle events.
+### FakeCallbackHandler
+
+Tracks callback events for testing. Maintains counters for all lifecycle events at fine granularity.
 
 ```python
 class FakeCallbackHandler(BaseCallbackHandler, BaseFakeCallbackHandlerMixin):
     """Fake callback handler for testing."""
     
-    # Fine-grained counters
+    # Aggregate counters
     starts: int = 0
     ends: int = 0
     errors: int = 0
+    text: int = 0
+    
+    # Fine-grained counters
     llm_starts: int = 0
     llm_ends: int = 0
     llm_streams: int = 0
@@ -340,6 +427,15 @@ class FakeCallbackHandler(BaseCallbackHandler, BaseFakeCallbackHandlerMixin):
     retriever_ends: int = 0
     retriever_errors: int = 0
     retries: int = 0
+    
+    # Configuration
+    ignore_llm_: bool = False
+    ignore_chain_: bool = False
+    ignore_agent_: bool = False
+    ignore_retriever_: bool = False
+    ignore_chat_model_: bool = False
+    fake_id: str | None = None
+    errors_args: list[Any] = []
 ```
 
 **Usage**:
@@ -352,26 +448,36 @@ handler = FakeCallbackHandler()
 # Invoke with callbacks
 model.invoke("query", callbacks=[handler])
 
-# Assert callback events
+# Assert callback events at fine granularity
 assert handler.llm_starts == 1
 assert handler.llm_ends == 1
-assert handler.starts == 1
-assert handler.ends == 1
+assert handler.chain_starts == 0
+assert handler.tool_starts == 0
 ```
 
 **Event Properties**:
 
-- `ignore_llm`, `ignore_chain`, `ignore_agent`, `ignore_retriever`: Skip tracking for specific component types
-- `errors_args`: Captured arguments from error callbacks
+- `ignore_llm`, `ignore_chain`, `ignore_agent`, `ignore_retriever`, `ignore_chat_model`: Skip tracking for specific component types
+- `errors_args`: Captured arguments from error callbacks for detailed inspection
 - `fake_id`: Optional identifier for comparing handlers (allows similar handlers to differ in equality)
 
 ## Message Testing Utilities
 
-### AnyStr Helper
-
 **Location**: `repo://libs/core/tests/unit_tests/stubs.py`
 
+### AnyStr Helper
+
 String subclass that matches any string value in equality comparisons. Useful for testing message IDs that are generated randomly.
+
+```python
+class AnyStr(str):
+    """String that equals any other string."""
+    
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, str)
+```
+
+**Usage**:
 
 ```python
 from tests.unit_tests.stubs import AnyStr
@@ -383,9 +489,35 @@ assert any_str == "different_value"   # True
 
 ### Message Factory Functions
 
-**Location**: `repo://libs/core/tests/unit_tests/stubs.py`
-
 Create messages with AnyStr IDs for content-based assertions independent of generated UUIDs.
+
+```python
+def _any_id_ai_message(**kwargs: Any) -> AIMessage:
+    """Create an `AIMessage` with an any id field."""
+    message = AIMessage(**kwargs)
+    message.id = AnyStr()
+    return message
+
+def _any_id_ai_message_chunk(**kwargs: Any) -> AIMessageChunk:
+    """Create an `AIMessageChunk` with an any id field."""
+    message = AIMessageChunk(**kwargs)
+    message.id = AnyStr()
+    return message
+
+def _any_id_human_message(**kwargs: Any) -> HumanMessage:
+    """Create a `HumanMessage` with an any id field."""
+    message = HumanMessage(**kwargs)
+    message.id = AnyStr()
+    return message
+
+def _any_id_document(**kwargs: Any) -> Document:
+    """Create a `Document` with an id field."""
+    message = Document(**kwargs)
+    message.id = AnyStr()
+    return message
+```
+
+**Usage**:
 
 ```python
 from tests.unit_tests.stubs import (
@@ -400,9 +532,9 @@ ai_msg = _any_id_ai_message(content="hello")
 human_msg = _any_id_human_message(content="hi")
 doc = _any_id_document(page_content="text")
 
-# Usage in assertions
+# Usage in assertions - matches content, ignores ID differences
 response = model.invoke("query")
-assert response == ai_msg  # Matches content, ignores ID differences
+assert response == ai_msg
 ```
 
 ## Pydantic Schema Utilities
@@ -426,7 +558,7 @@ def test_pydantic_v1_model():
 
 ### _schema Function
 
-Extracts and normalizes JSON schemas from Pydantic models.
+Extracts and normalizes JSON schemas from Pydantic models, handling differences between Pydantic v1 and v2.
 
 ```python
 from tests.unit_tests.pydantic_utils import _schema
@@ -437,13 +569,15 @@ class MyModel(BaseModel):
     age: int
 
 schema = _schema(MyModel)
-# Returns normalized JSON schema
+# Returns normalized JSON schema with v1/v2 differences resolved
 ```
 
 ### Schema Normalization Functions
 
+Internal utilities for normalizing schemas across Pydantic versions:
+
 - `replace_all_of_with_ref()`: Collapses single-element allOf into $ref
-- `remove_all_none_default()`: Removes incorrect None defaults from v2 schemas
+- `remove_all_none_default()`: Removes incorrect None defaults from v2 schemas (which uses NotRequired)
 - `_remove_enum()`: Removes enum descriptions
 - `_remove_additionalproperties()`: Removes additionalProperties: true from dict properties
 
@@ -451,9 +585,9 @@ schema = _schema(MyModel)
 
 ### LANGGRAPH_TEST_FAST
 
-**Type**: Environment variable (boolean)
+**Type**: Environment variable (boolean, default: `true`)
 
-Controls which checkpoint and store backends are tested. Set to `true` (default) for fast iteration with only in-memory backends.
+Controls which checkpoint and store backends are tested. Set to `true` for fast iteration with only in-memory backends, or `false` to test against all backends including sqlite and postgres.
 
 ```bash
 # Fast mode: only in-memory
@@ -463,17 +597,32 @@ LANGGRAPH_TEST_FAST=true pytest tests/
 LANGGRAPH_TEST_FAST=false pytest tests/
 ```
 
-**Default**: `true`
-
 **Behavior**:
 - When `true`: `sync_checkpointer` and `async_checkpointer` parametrize only over memory backends
 - When `false`: Test against sqlite, postgres with various connection strategies (pipe, pool)
+
+### hermetic_env Fixture (OpenAI Partner Tests)
+
+**Location**: `repo://libs/partners/openai/tests/unit_tests/conftest.py`
+
+Isolates unit tests from ambient OpenAI and gateway configuration by clearing all gateway and provider environment variables.
+
+```python
+@pytest.fixture(autouse=True)
+def hermetic_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Isolate unit tests from ambient OpenAI and gateway configuration."""
+    for var in (*_GATEWAY_VARS, *_PROVIDER_VARS):
+        monkeypatch.delenv(var, raising=False)
+    monkeypatch.setenv("OPENAI_API_KEY", "foo")
+```
+
+**Usage**: Automatically applied to all OpenAI partner tests. Ensures tests run offline against mocked clients without being affected by real credentials or base URLs.
 
 ## Test Infrastructure Patterns
 
 ### Running Tests
 
-From `repo://libs/core/Makefile`:
+From the codebase Makefiles:
 
 ```bash
 # Run all unit tests in parallel with socket restrictions
@@ -524,16 +673,12 @@ def test_checkpoint(sync_checkpointer, backend):
 ### Async Test Pattern
 
 ```python
-@pytest.mark.asyncio
-async def test_async_invoke():
-    model = ChatOpenAI()
-    result = await model.ainvoke("Hello")
-    assert result.content is not None
-
-# Or use pytest-anyio with anyio_backend fixture
+# Using pytest-anyio with anyio_backend fixture
 async def test_with_anyio():
     # Runs with asyncio backend
-    pass
+    model = GenericFakeChatModel(messages=iter([AIMessage(content="test")]))
+    result = await model.ainvoke("Hello")
+    assert result.content is not None
 ```
 
 ## Standard Test Classes
@@ -546,4 +691,4 @@ Standard base test classes enforce consistent testing across integrations:
 - `EmbeddingsUnitTests`: Base class for embeddings implementations
 - `ToolsUnitTests`: Base class for tool implementations
 
-See `/openwiki/unit-tests.md` for detailed documentation on standard test class configuration and supported feature flags.
+See `/openwiki/testing/unit-tests.md` for detailed documentation on standard test class configuration and supported feature flags.

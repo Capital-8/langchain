@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:dbec4895ac9641ee74dc9c0f8d041691efa16c11e3cc174a3f24085ba3e7423a",
+  "pageVersion": "sha256:d5d6375f346777a7013a5d08f0b231ef279c621e98bc14fb3478c566629f97a5",
   "claims": [
     {
       "id": "claim_ce6852d27a0448efb1e79c96826e6363",
@@ -84,15 +84,19 @@
     },
     {
       "id": "claim_e8a1344fb38c46278144c5f62e796481",
-      "statement": "Partner packages expose configuration via Pydantic fields (constructor params), environment variable fallback, model_kwargs catch-all for unsupported params, and endpoint override support.",
+      "statement": "Partner packages expose configuration via Pydantic fields (constructor params), environment variable fallback, model_kwargs catch-all for unsupported params, and endpoint override support. Configuration is resolved during validate_environment(), which merges constructor kwargs with model_kwargs via _build_model_kwargs().",
       "evidence": [
         {
-          "resource": "repo://libs/partners/openai/langchain_openai/chat_models/base.py#L783-L1100",
-          "version": "repo-lines-v1:sha256:349d80f8665c3cb0cd146f4dee1884a7ad104be3be3b2a1b526876092891204c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzE4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyMGFiMjY0MDYwOGE2ZWRiYWRhODAyZWE3ZWMwNTY2MTNiYTkxYWNkOWU3YThiMGY3MThkZjg0NWI4OGMwZTAxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5YmNhZGM0ZTI5YzJjNDVlMjkyOTY3MGZmYjRiYjQ2YmNiYzQ0ZWFiMzUwMjcwMzViZjQ1ZmIxYjE3YmM1NWQ1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIzMGEwNTc1YTY2ZmIxMTEyMGFhN2QwY2VhNGU5MmRhMDM1OTkzNWQzOTBlOGUwNjRiZjAzNDVjMWY4ZjRkMTNhIn0"
+          "resource": "repo://libs/partners/anthropic/langchain_anthropic/chat_models.py#L1331-L1600",
+          "version": "repo-lines-v1:sha256:5fae2f00b9ae33ba349236dc462b749489975ddd44fe241e3269694944ad7c9d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIzMDhkMDMwZGI5NGUwMTEwNTRkMTY3ZGFjODI1NjI5YzRhMzdiYTM5OGE2Yzc2MmZkNzg3NzIyNDkzY2Y1MTNiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwNzI2ZDMxNWQzMzgzZWJkZDQxYmYzNDdlNzc5ZGYxMTJkZmEyNzE4OGE5ZDU3YTllNzVjMzQyZjk5OTIzMDQ1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJkYWZlMzQ1ZWY0MGNkZDdkMDg2MDRmNGQwNWQ5MTRlZDA2NzIyZWM1NDViMTViNGRmZmJiOGI3YjllMGYyOTc2IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIyNzc2MDI5MWE5ZDIwNDU5YjgwOWYzMWQzMzkwMzFlNjUwYTZmNDNhNGQxMDI2MjVkZmFhNmNmMDQ3YWQxMzM1In0"
         },
         {
-          "resource": "repo://libs/partners/openai/pyproject.toml#L23-L30",
-          "version": "repo-lines-v1:sha256:bc964446fa75f5b961992f40f6d754687de435fc6e9af490eea6cca3a9f9a5df:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTliMmNmNDg0ZWJjOTg3MzUwZjY4MTYyY2EyNDBjYTFmOWM0YmMzOWUyZDcyZTJmMzAzNTNiMzllN2FkNjZlNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjk0MTZlMDlmNzhiYTMxNmMwMzI1NjgyMTNiODU1ZWU3NTZlNDE1NjVkOTE4ZjA5NTE5YzgxZmQ2MjBmNDA2MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzBlM2JkZDc0YWJkOGViYjVjMDMyNTNkNGZmNTA2ZmNhZmNjYWExZDkyMDVlMWQxZmMzMzUzOGY2MTViMTI1OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWE1MWQ5N2ZmNTI1YzUxZDhmNWFhM2JjNzRkMmM2OGI5YThkOGFiNTZhMGFhZWM5YzE0ZGZlY2JhYTE0OTQzMyJ9"
+          "resource": "repo://libs/partners/openai/langchain_openai/chat_models/base.py#L787-L1000",
+          "version": "repo-lines-v1:sha256:5d1ce62b232a8808393ee5f9a6835ad36d856db56b0a598922a9ea1d8b0d4c39:eyJzZWxlY3RlZExpbmVDb3VudCI6MjE0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyMGFiMjY0MDYwOGE2ZWRiYWRhODAyZWE3ZWMwNTY2MTNiYTkxYWNkOWU3YThiMGY3MThkZjg0NWI4OGMwZTAxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5YmNhZGM0ZTI5YzJjNDVlMjkyOTY3MGZmYjRiYjQ2YmNiYzQ0ZWFiMzUwMjcwMzViZjQ1ZmIxYjE3YmM1NWQ1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI5ZDEyZmNiMzUzODQxNDVkZjhiZGE0MTRlMjRmNzU4OTJkNWFiZjdiMjRkNGJkNzUyM2Y0NjA5MDgxODYyNTNkIn0"
+        },
+        {
+          "resource": "repo://libs/partners/openai/pyproject.toml#L1-L36",
+          "version": "repo-lines-v1:sha256:d81971bf722449b34c9ce1a229acfab9f9df1e7a7351c4505282df27789d552e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA0NTY5OTQ2YWM5YmJlN2NiMmNkZWMzZjhiZWNmMzQzNzUwYzU4YjliMzIxZWMyMTk1YmZiYWFiMmFhOGM0YmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhlYTc4NDA5ZTY2NWY3NmYxNWE4YjU5ZTY5NmQ4MzY5ZTM3MjZjZWIwNDU1NDQyZWNjODJjNTk1ZWE1MjQ0YjUifQ"
         }
       ]
     },
@@ -128,11 +132,15 @@
     },
     {
       "id": "claim_b3e08f8d1f9d4b23af8b2e6ca4c40632",
-      "statement": "Partner packages declare dependencies on langchain-core (stable abstractions) and provider SDKs (official client libraries), with optional extras for advanced features (e.g., azure-identity).",
+      "statement": "Partner packages declare dependencies on langchain-core (stable abstractions) and provider SDKs (official client libraries), with optional extras for advanced features (e.g., azure-identity). Anthropic and OpenAI both pin provider SDK versions and langchain-core version ranges to prevent breaking changes.",
       "evidence": [
         {
-          "resource": "repo://libs/partners/openai/pyproject.toml#L5-L30",
-          "version": "repo-lines-v1:sha256:a0740ea428eff5e04c680af3039a23c7c9b362dc9bedadf953dd039e4bc4af0d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcwMmE4MWMzODM2ZWRlZjJkMGJhMTFkMjM1M2ZiNmRhYmM3NzcxNTBhN2NhODNlYTBkOWU5YTcwMzEzZmVhYmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5NDE2ZTA5Zjc4YmEzMTZjMDMyNTY4MjEzYjg1NWVlNzU2ZTQxNTY1ZDkxOGYwOTUxOWM4MWZkNjIwZjQwNjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxMzdhYWFhYzhhZjRmMGNiYjA4YTcxZjZlNTRjMjhmYjBhNDgxYjdlYWRlZWExMjEzNGM0NzM4NzUzNGU3ZjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVhNTFkOTdmZjUyNWM1MWQ4ZjVhYTNiYzc0ZDJjNjhiOWE4ZDhhYjU2YTBhYWVjOWMxNGRmZWNiYWExNDk0MzMifQ"
+          "resource": "repo://libs/partners/anthropic/pyproject.toml#L1-L50",
+          "version": "repo-lines-v1:sha256:db87cccd99f6d153fdfb384ace5f51ed6af5a84e2d7b68ac600ce492454b533e:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA0NTY5OTQ2YWM5YmJlN2NiMmNkZWMzZjhiZWNmMzQzNzUwYzU4YjliMzIxZWMyMTk1YmZiYWFiMmFhOGM0YmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU2ZTg1YzUyNjM2YjRkMjcwYjI3OTc2ZmYyNDMzNzM2ZTFiZGIwMmIyMGI0YWY0NDBlNGE5M2QzODBmNjVlYzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBmNjA0MzBjMDFmNTExNzQzYjg4MzljZjUwYzk0ZWVjZTI2NzE1Nzc4NmQ0OTMzYzc5ODE1MDRiZjFlNTU5OTUifQ"
+        },
+        {
+          "resource": "repo://libs/partners/openai/pyproject.toml#L1-L36",
+          "version": "repo-lines-v1:sha256:d81971bf722449b34c9ce1a229acfab9f9df1e7a7351c4505282df27789d552e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA0NTY5OTQ2YWM5YmJlN2NiMmNkZWMzZjhiZWNmMzQzNzUwYzU4YjliMzIxZWMyMTk1YmZiYWFiMmFhOGM0YmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhlYTc4NDA5ZTY2NWY3NmYxNWE4YjU5ZTY5NmQ4MzY5ZTM3MjZjZWIwNDU1NDQyZWNjODJjNTk1ZWE1MjQ0YjUifQ"
         }
       ]
     },
@@ -149,6 +157,6 @@
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-11-13T08:16:35.902Z"
+    "at": "2026-11-15T08:15:26.682Z"
   }
 }

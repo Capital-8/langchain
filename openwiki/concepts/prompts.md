@@ -1,8 +1,8 @@
 ---
-type: "Reference"
-title: "Prompts: Templates and Formatting"
-description: "Prompt templates define parameterized message sequences and variable substitution patterns for language models. Covers template syntax, variable handling, few-shot learning, image inputs, message composition, PromptValue routing, and runnable integration."
-tags: [prompt, template, few-shot, variable-substitution, runnable, composition, chat-model, image-input, formatting]
+type: "Concept"
+title: "Prompts: Template System"
+description: "Prompt templates are the primary input interface to language models in LangChain. They accept user-provided variables, format them into structured message sequences, and return PromptValue objects. Covers the template hierarchy (PromptTemplate, ChatPromptTemplate, FewShotPromptTemplate), variable management, composition patterns, and integration with chat models."
+tags: [prompt, template, few-shot, variable-substitution, runnable, composition, chat-model, message-formatting, template-composition]
 sources:
   - id: openwiki-source-269af2bb49a21bd6c548b3f0
     resource: repo://libs/core/langchain_core/prompt_values.py
@@ -19,7 +19,7 @@ sources:
 generated: { by: "openwiki/0.5.0", at: "2026-11-13T08:16:35.902Z" }
 verified:
   - by: openwiki/0.5.0
-    at: 2026-11-13T08:16:35.902Z
+    at: 2026-11-15T08:15:26.682Z
 ---
 
 # Prompts: Templates and Formatting
